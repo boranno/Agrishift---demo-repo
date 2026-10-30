@@ -2,6 +2,8 @@
 
 NASA Earth-observation-informed crop suitability and crop-rotation decision support.
 
+[AgriShift Demo](https://agrishift-demo-7m3q.vercel.app/)
+
 ## Status
 Initial scaffold only; planned features and models are not implemented yet.
 
