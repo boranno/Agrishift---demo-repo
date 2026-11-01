@@ -85,46 +85,30 @@ export const Navbar = () => {
           </div>
         </Link>
 
-        {/* Desktop Navigation Links */}
-        <nav className="desktop-nav-links">
-          {navLinks.slice(0, 6).map(link => (
-            <Link
-              key={link.to}
-              to={link.to}
-              style={{
-                padding: '0.45rem 0.75rem',
-                fontSize: 'var(--font-size-sm)',
-                fontWeight: isCurrent(link.to) ? 'var(--font-weight-bold)' : 'var(--font-weight-medium)',
-                color: isCurrent(link.to) ? 'var(--color-primary-800)' : 'var(--color-text-main)',
-                backgroundColor: isCurrent(link.to) ? 'var(--color-primary-50)' : 'transparent',
-                borderRadius: 'var(--radius-md)',
-                transition: 'all var(--transition-fast)'
-              }}
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
-
-        {/* Header Right Actions */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          {/* Active Farm Pill (Desktop) */}
+        {/* Header Right Utility Controls */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+          {/* Active Farm Location Selector Pill */}
           {farm && (
             <Link
               to="/farm-map"
               className="badge badge-neutral active-farm-nav-badge"
               style={{
                 alignItems: 'center',
-                gap: '0.35rem',
+                gap: '0.4rem',
                 textDecoration: 'none',
-                padding: '0.35rem 0.75rem',
-                fontSize: 'var(--font-size-xs)'
+                padding: '0.4rem 0.85rem',
+                fontSize: 'var(--font-size-xs)',
+                fontWeight: 'var(--font-weight-semibold)',
+                backgroundColor: 'var(--color-bg-cream)',
+                border: '1px solid var(--color-border)',
+                borderRadius: 'var(--radius-full)',
+                color: 'var(--color-primary-900)'
               }}
               title={isBangla ? 'খামার অবস্থান পরিবর্তন করুন' : 'Change farm location'}
               id="active-farm-badge"
             >
-              <MapPin size={12} color="var(--color-primary-700)" />
-              <span style={{ maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <MapPin size={13} color="var(--color-primary-700)" />
+              <span style={{ maxWidth: '160px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {farm.upazila}, {farm.district}
               </span>
             </Link>
@@ -140,9 +124,11 @@ export const Navbar = () => {
               alignItems: 'center',
               gap: '0.4rem',
               fontWeight: 'var(--font-weight-semibold)',
-              padding: '0.4rem 0.8rem',
+              padding: '0.4rem 0.85rem',
               backgroundColor: 'var(--color-bg-cream)',
-              borderColor: 'var(--color-border)'
+              borderColor: 'var(--color-border)',
+              borderRadius: 'var(--radius-full)',
+              color: 'var(--color-primary-900)'
             }}
             aria-label={isBangla ? 'Switch to English' : 'বাংলায় পরিবর্তন করুন'}
             title={isBangla ? 'Switch to English' : 'বাংলা ভাষায় দেখুন'}
@@ -170,7 +156,10 @@ export const Navbar = () => {
           borderTop: '1px solid var(--color-border)',
           padding: '1rem',
           boxShadow: 'var(--shadow-md)',
-          animation: 'fadeIn var(--transition-fast) ease-out'
+          animation: 'fadeIn var(--transition-fast) ease-out',
+          maxHeight: 'calc(100vh - var(--header-total-height, 93px))',
+          overflowY: 'auto',
+          overscrollBehavior: 'contain'
         }}>
           {farm && (
             <div style={{

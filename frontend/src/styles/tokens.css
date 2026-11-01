@@ -155,6 +155,8 @@
   --sidebar-width: 270px;
   --sidebar-collapsed-width: 72px;
   --header-height: 64px;
+  --ribbon-height: 29px;
+  --header-total-height: 93px;
   --max-content-width: 1280px;
 }
 

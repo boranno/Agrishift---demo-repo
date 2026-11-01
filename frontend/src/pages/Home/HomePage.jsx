@@ -27,7 +27,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from '../../hooks/useTranslation';
 import DemoBadge from '../../components/common/DemoBadge';
-import HeroCinematicDiorama from '../../components/home/HeroCinematicDiorama';
+import HeroNasaGlobe from '../../components/home/HeroNasaGlobe';
 
 export const HomePage = () => {
   const { t, isBangla } = useTranslation();
@@ -206,9 +206,9 @@ export const HomePage = () => {
               </div>
             </div>
 
-            {/* Right Column: True 3D Isometric Soil & Crop Diorama Scene */}
+            {/* Right Column: Interactive 3D NASA Earth Observation Globe */}
             <div>
-              <HeroCinematicDiorama />
+              <HeroNasaGlobe />
             </div>
 
           </div>
