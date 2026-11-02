@@ -27,7 +27,7 @@ export const StatusBadge = ({ status = 'suitable', label, size = 'md' }) => {
     info: {
       className: 'badge-info',
       icon: Info,
-      defaultLabel: 'Info',
+      defaultLabel: isBangla ? 'তথ্য' : 'Info',
       iconColor: 'var(--color-info-dot)'
     }
   };
@@ -54,4 +54,3 @@ export const StatusBadge = ({ status = 'suitable', label, size = 'md' }) => {
 };
 
 export default StatusBadge;
-

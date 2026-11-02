@@ -100,8 +100,8 @@ export const Footer = () => {
             © {new Date().getFullYear()} AgriShift — {t('footer.copyright')}
           </div>
           <div style={{ display: 'flex', gap: '1rem' }}>
-            <span className="badge badge-demo">Part 1 Frontend Scaffold</span>
-            <span>Locale: {isBangla ? 'বাংলা (BD)' : 'English (US)'}</span>
+            <span className="badge badge-demo">{isBangla ? 'পর্ব ১ ফ্রন্টএন্ড কাঠামো' : 'Part 1 Frontend Scaffold'}</span>
+            <span>{isBangla ? 'ভাষা: বাংলা (বাংলাদেশ)' : 'Language: English (US)'}</span>
           </div>
         </div>
       </div>
@@ -110,4 +110,3 @@ export const Footer = () => {
 };
 
 export default Footer;
-

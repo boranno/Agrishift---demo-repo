@@ -11,6 +11,7 @@ import { useTranslation } from '../../hooks/useTranslation';
 import { useFarm } from '../../context/FarmContext';
 import PageHeader from '../../components/common/PageHeader';
 import DemoBadge from '../../components/common/DemoBadge';
+import { localizeFarmValue } from '../../utils/farmDisplay';
 
 export const SoilHealthHistoryPage = () => {
   const { t, isBangla } = useTranslation();
@@ -25,6 +26,7 @@ export const SoilHealthHistoryPage = () => {
       ph: 6.8,
       om: 1.65,
       source: 'SRDI Khulna Regional Lab #4029',
+      sourceBn: 'এসআরডিআই খুলনা আঞ্চলিক পরীক্ষাগার #৪০২৯',
       notesBn: 'আমন ধান কর্তন-পূর্ব টেস্ট। লবণাক্ততা স্বাভাবিক সীমার মধ্যে।'
     },
     {
@@ -35,6 +37,7 @@ export const SoilHealthHistoryPage = () => {
       ph: 7.2,
       om: 1.50,
       source: 'Farmer Field Kit Test (Dacope)',
+      sourceBn: 'কৃষকের মাঠপর্যায়ের কিট পরীক্ষা (দাকোপ)',
       notesBn: 'শুষ্ক মৌসুমের বাষ্পীভবনে লবণাক্ততা বৃদ্ধি। মিষ্টি পানির ফ্লাশিং করা হয়েছিল।'
     },
     {
@@ -45,6 +48,7 @@ export const SoilHealthHistoryPage = () => {
       ph: 6.7,
       om: 1.42,
       source: 'DAE Soil Demonstration Survey',
+      sourceBn: 'কৃষি সম্প্রসারণ অধিদপ্তরের মাটি প্রদর্শনী জরিপ',
       notesBn: 'বর্ষার পানিতে অতিরিক্ত লবণ ধুয়ে নেমে যায়।'
     }
   ];
@@ -53,7 +57,7 @@ export const SoilHealthHistoryPage = () => {
     <div>
       <PageHeader
         title={isBangla ? 'মাটির স্বাস্থ্যের ইতিহাস' : 'Soil Health & Salinity History'}
-        subtitle={`${farm?.upazila || 'Dacope'}, ${farm?.district || 'Khulna'}`}
+        subtitle={`${localizeFarmValue(farm?.upazila || 'Dacope', isBangla)}, ${localizeFarmValue(farm?.district || 'Khulna', isBangla)}`}
         badge={<DemoBadge text="Historical Log" />}
         helpText={isBangla
           ? 'গত কয়েক মৌসুমের মাটি পরীক্ষার তথ্য সংরক্ষণ ও পর্যবেক্ষণের মাধ্যমে মাটির ক্ষয়ক্ষতি বা লবণাক্ততার গতিবিধি ট্র্যাক করুন।'
@@ -77,7 +81,7 @@ export const SoilHealthHistoryPage = () => {
                 <th style={{ padding: '0.65rem 0.75rem' }}>{t('common.season')}</th>
                 <th style={{ padding: '0.65rem 0.75rem' }}>ECe (dS/m)</th>
                 <th style={{ padding: '0.65rem 0.75rem' }}>pH</th>
-                <th style={{ padding: '0.65rem 0.75rem' }}>OM (%)</th>
+                <th style={{ padding: '0.65rem 0.75rem' }}>{isBangla ? 'জৈব পদার্থ (%)' : 'Organic Matter (%)'}</th>
                 <th style={{ padding: '0.65rem 0.75rem' }}>{t('common.source')}</th>
               </tr>
             </thead>
@@ -93,7 +97,7 @@ export const SoilHealthHistoryPage = () => {
                   </td>
                   <td style={{ padding: '0.65rem 0.75rem' }}>{rec.ph}</td>
                   <td style={{ padding: '0.65rem 0.75rem' }}>{rec.om}%</td>
-                  <td style={{ padding: '0.65rem 0.75rem', color: 'var(--color-text-secondary)' }}>{rec.source}</td>
+                  <td style={{ padding: '0.65rem 0.75rem', color: 'var(--color-text-secondary)' }}>{isBangla ? rec.sourceBn : rec.source}</td>
                 </tr>
               ))}
             </tbody>
@@ -105,4 +109,3 @@ export const SoilHealthHistoryPage = () => {
 };
 
 export default SoilHealthHistoryPage;
-

@@ -4,6 +4,10 @@ import bn from '../locales/bn.json';
 
 const translations = { en, bn };
 const STORAGE_KEY = 'agrishift_language';
+const PAGE_TITLES = {
+  en: 'AgriShift — Crop Rotation Decision Support Tool in Saline Coastal Lands',
+  bn: 'AgriShift — লবণাক্ত উপকূলীয় অঞ্চলে ফসল পর্যায়ক্রম সিদ্ধান্ত-সহায়তা'
+};
 
 export const LanguageContext = createContext(null);
 
@@ -36,6 +40,7 @@ export const LanguageProvider = ({ children }) => {
 
   useEffect(() => {
     document.documentElement.lang = language;
+    document.title = PAGE_TITLES[language];
   }, [language]);
 
   /**
@@ -88,4 +93,3 @@ export const useLanguage = () => {
   }
   return context;
 };
-

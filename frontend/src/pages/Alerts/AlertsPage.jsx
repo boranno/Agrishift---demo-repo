@@ -99,7 +99,7 @@ export const AlertsPage = () => {
               <Smartphone size={18} color="var(--color-primary-800)" />
               <span>{t('alerts.notificationPreferences')}</span>
             </h3>
-            <span className="badge badge-neutral">Demo Settings</span>
+            <span className="badge badge-neutral">{isBangla ? 'নমুনা সেটিংস' : 'Demo Settings'}</span>
           </div>
 
           {settingsSaved && (
@@ -121,7 +121,7 @@ export const AlertsPage = () => {
                   value={phoneNumber}
                   onChange={e => setPhoneNumber(e.target.value)}
                   className="form-control"
-                  placeholder="017XXXXXXXX"
+                  placeholder={isBangla ? '০১৭XXXXXXXX' : '017XXXXXXXX'}
                 />
               </div>
 
@@ -271,4 +271,3 @@ export const AlertsPage = () => {
 };
 
 export default AlertsPage;
-

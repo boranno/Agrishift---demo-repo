@@ -18,6 +18,7 @@ import {
 import { useTranslation } from '../../hooks/useTranslation';
 import { useFarm } from '../../context/FarmContext';
 import { CROPS_CATALOG, evaluateCropSuitability } from '../../services/cropService';
+import { localizeFarmValue } from '../../utils/farmDisplay';
 import PageHeader from '../../components/common/PageHeader';
 import DemoBadge from '../../components/common/DemoBadge';
 import StatusBadge from '../../components/common/StatusBadge';
@@ -60,7 +61,7 @@ export const CropSuitabilityPage = () => {
     <div>
       <PageHeader
         title={t('cropSuitability.title')}
-        subtitle={`${farm?.upazila || 'Dacope'}, ${farm?.district || 'Khulna'} — ${isBangla ? 'মাটির লবণাক্ততা:' : 'Current Soil Salinity:'} ${soilEc} dS/m (ECe)`}
+        subtitle={`${localizeFarmValue(farm?.upazila || 'Dacope', isBangla)}, ${localizeFarmValue(farm?.district || 'Khulna', isBangla)} — ${isBangla ? 'মাটির লবণাক্ততা:' : 'Current Soil Salinity:'} ${soilEc} dS/m (ECe)`}
         badge={<DemoBadge text="Feature 6" />}
         actions={
           <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -114,7 +115,7 @@ export const CropSuitabilityPage = () => {
               {isBangla ? 'সক্রিয় পরিবেশগত পরামিতি' : 'Environmental Context'}
             </div>
             <div style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-primary-900)' }}>
-              EC: {soilEc} dS/m | {farm?.soilType || 'Clay Loam'} | {farm?.waterSource || 'Pond storage'}
+              {isBangla ? 'ইসি:' : 'EC:'} {soilEc} dS/m | {localizeFarmValue(farm?.soilType || 'Clay Loam', isBangla)} | {localizeFarmValue(farm?.waterSource || 'Pond storage', isBangla)}
             </div>
           </div>
         </div>
@@ -369,10 +370,15 @@ export const CropSuitabilityPage = () => {
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.5rem', fontSize: 'var(--font-size-xs)' }}>
-                <div><strong>ফলন সম্ভাবনা:</strong> {selectedCropModal.yieldPotential}</div>
-                <div><strong>মাটির পিএইচ সীমা:</strong> {selectedCropModal.soilPhMin} – {selectedCropModal.soilPhMax}</div>
-                <div><strong>উপযুক্ত মৌসুম:</strong> {selectedCropModal.seasons.join(', ')}</div>
-                <div><strong>লবণাক্ততার সর্বোচ্চ সীমা:</strong> {selectedCropModal.maxSalinityEc} dS/m</div>
+                <div><strong>{isBangla ? 'ফলনের সম্ভাবনা:' : 'Yield potential:'}</strong> {isBangla
+                  ? selectedCropModal.yieldPotential
+                    .replace(/ton\/ha/g, 'টন/হেক্টর')
+                    .replace('green biomass', 'সবুজ জৈব পদার্থ')
+                    .replace('fibre', 'আঁশ')
+                  : selectedCropModal.yieldPotential}</div>
+                <div><strong>{isBangla ? 'মাটির পিএইচ সীমা:' : 'Soil pH range:'}</strong> {selectedCropModal.soilPhMin} – {selectedCropModal.soilPhMax}</div>
+                <div><strong>{isBangla ? 'উপযুক্ত মৌসুম:' : 'Suitable seasons:'}</strong> {selectedCropModal.seasons.map(season => t(`seasons.${season}`)).join(', ')}</div>
+                <div><strong>{isBangla ? 'সর্বোচ্চ লবণাক্ততা:' : 'Maximum salinity:'}</strong> {selectedCropModal.maxSalinityEc} dS/m</div>
               </div>
             </div>
 
@@ -393,4 +399,3 @@ export const CropSuitabilityPage = () => {
 };
 
 export default CropSuitabilityPage;
-

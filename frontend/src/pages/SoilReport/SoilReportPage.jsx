@@ -262,13 +262,13 @@ export const SoilReportPage = () => {
                   </span>
                 </div>
                 <span className="badge badge-suitable" style={{ fontSize: '11px' }}>
-                  OCR Scanned
+                  {isBangla ? 'ওসিআর স্ক্যান সম্পন্ন' : 'OCR Scanned'}
                 </span>
               </div>
 
               {filePreview ? (
                 <div style={{ maxHeight: '220px', overflow: 'hidden', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)' }}>
-                  <img src={filePreview} alt="Soil Card Preview" style={{ width: '100%', height: 'auto', display: 'block' }} />
+                  <img src={filePreview} alt={isBangla ? 'মাটি পরীক্ষার কার্ডের প্রিভিউ' : 'Soil Card Preview'} style={{ width: '100%', height: 'auto', display: 'block' }} />
                 </div>
               ) : (
                 <div style={{
@@ -278,10 +278,10 @@ export const SoilReportPage = () => {
                   fontSize: 'var(--font-size-xs)',
                   lineHeight: 1.6
                 }}>
-                  <div><strong>Document:</strong> {extractionResult?.cardName || 'SRDI Official Soil Health Card'}</div>
-                  <div><strong>Farmer:</strong> {extractionResult?.farmerName || 'Md. Rafiqul Islam'}</div>
-                  <div><strong>Location:</strong> {extractionResult?.district || 'Khulna'}, {extractionResult?.upazila || 'Dacope'}</div>
-                  <div><strong>Texture:</strong> {extractionResult?.soilTexture || 'Clay Loam (Ganges Alluvium)'}</div>
+                  <div><strong>{isBangla ? 'নথি:' : 'Document:'}</strong> {extractionResult?.cardName || (isBangla ? 'এসআরডিআই-এর সরকারি মাটি স্বাস্থ্য কার্ড' : 'SRDI Official Soil Health Card')}</div>
+                  <div><strong>{isBangla ? 'কৃষক:' : 'Farmer:'}</strong> {extractionResult?.farmerName || (isBangla ? 'মোঃ রফিকুল ইসলাম' : 'Md. Rafiqul Islam')}</div>
+                  <div><strong>{isBangla ? 'অবস্থান:' : 'Location:'}</strong> {extractionResult?.district || (isBangla ? 'খুলনা' : 'Khulna')}, {extractionResult?.upazila || (isBangla ? 'দাকোপ' : 'Dacope')}</div>
+                  <div><strong>{isBangla ? 'মাটির গঠন:' : 'Texture:'}</strong> {extractionResult?.soilTexture || (isBangla ? 'গঙ্গা পলির দোআঁশ' : 'Clay Loam (Ganges Alluvium)')}</div>
                 </div>
               )}
             </div>
@@ -441,7 +441,7 @@ export const SoilReportPage = () => {
                   step="0.01"
                   value={formFields.zinc}
                   onChange={e => handleInputChange('zinc', e.target.value)}
-                  placeholder="Optional"
+                  placeholder={isBangla ? 'ঐচ্ছিক' : 'Optional'}
                   className="form-control"
                 />
               </div>
@@ -456,7 +456,7 @@ export const SoilReportPage = () => {
                   step="0.01"
                   value={formFields.boron}
                   onChange={e => handleInputChange('boron', e.target.value)}
-                  placeholder="Optional"
+                  placeholder={isBangla ? 'ঐচ্ছিক' : 'Optional'}
                   className="form-control"
                 />
               </div>
@@ -474,4 +474,3 @@ export const SoilReportPage = () => {
 };
 
 export default SoilReportPage;
-

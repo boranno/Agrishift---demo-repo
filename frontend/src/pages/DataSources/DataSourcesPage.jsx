@@ -119,10 +119,14 @@ export const DataSourcesPage = () => {
       id: 'smap',
       product: t('dataSources.smap'),
       provider: 'NASA Jet Propulsion Laboratory (JPL)',
+      providerBn: 'NASA Jet Propulsion Laboratory (JPL)',
       variable: t('dataSources.smapParam'),
       spatialRes: '9 km / 36 km EASE-Grid 2.0',
+      spatialResBn: '৯ কিমি / ৩৬ কিমি EASE-Grid 2.0',
       temporalRes: 'Daily (Morning 6:00 AM descending pass)',
+      temporalResBn: 'দৈনিক (সকাল ৬টার নিম্নমুখী কক্ষপথ)',
       accessProtocol: 'NASA Earthdata Cloud / OpenDAP',
+      accessProtocolBn: 'NASA Earthdata Cloud / OpenDAP',
       statusEn: 'Pipeline Schema Ready (Awaiting Backend Ingestion)',
       statusBn: 'পাইপলাইন স্কিমা প্রস্তুত (ব্যাকএন্ড সংযোগ অপেক্ষমাণ)',
       isIngested: false,
@@ -133,10 +137,14 @@ export const DataSourcesPage = () => {
       id: 'modis',
       product: t('dataSources.modis'),
       provider: 'NASA GSFC / Terra & Aqua Missions',
+      providerBn: 'NASA GSFC / Terra ও Aqua মিশন',
       variable: t('dataSources.modisParam'),
       spatialRes: '250 m (MOD13Q1 / MYD13Q1)',
+      spatialResBn: '২৫০ মিটার (MOD13Q1 / MYD13Q1)',
       temporalRes: '16-Day Cloud-Free Composite',
+      temporalResBn: '১৬ দিনের মেঘমুক্ত সমন্বিত চিত্র',
       accessProtocol: 'LP DAAC / NASA Earthdata Search',
+      accessProtocolBn: 'LP DAAC / NASA Earthdata Search',
       statusEn: 'Pipeline Schema Ready (Awaiting Backend Ingestion)',
       statusBn: 'পাইপলাইন স্কিমা প্রস্তুত (ব্যাকএন্ড সংযোগ অপেক্ষমাণ)',
       isIngested: false,
@@ -147,10 +155,14 @@ export const DataSourcesPage = () => {
       id: 'gpm',
       product: t('dataSources.gpm'),
       provider: 'NASA / JAXA Global Precipitation Measurement',
+      providerBn: 'NASA / JAXA বৈশ্বিক বৃষ্টিপাত পরিমাপ মিশন',
       variable: t('dataSources.gpmParam'),
       spatialRes: '0.1° x 0.1° (~10 km resolution)',
+      spatialResBn: '০.১° x ০.১° (প্রায় ১০ কিমি রেজোলিউশন)',
       temporalRes: 'Early Run (4-hr latency) & Final Daily Run',
+      temporalResBn: 'প্রাথমিক তথ্য (৪ ঘণ্টা বিলম্ব) ও চূড়ান্ত দৈনিক তথ্য',
       accessProtocol: 'GES DISC / HTTPS API',
+      accessProtocolBn: 'GES DISC / HTTPS API',
       statusEn: 'Pipeline Schema Ready (Awaiting Backend Ingestion)',
       statusBn: 'পাইপলাইন স্কিমা প্রস্তুত (ব্যাকএন্ড সংযোগ অপেক্ষমাণ)',
       isIngested: false,
@@ -161,10 +173,14 @@ export const DataSourcesPage = () => {
       id: 'landsat',
       product: t('dataSources.landsat'),
       provider: 'USGS / NASA Earth Resources Observation (EROS)',
+      providerBn: 'USGS / NASA Earth Resources Observation (EROS)',
       variable: t('dataSources.landsatParam'),
       spatialRes: '30 m Multispectral / 15 m Pan-sharpened',
+      spatialResBn: '৩০ মিটার মাল্টিস্পেকট্রাল / ১৫ মিটার প্যান-শার্পেনড',
       temporalRes: '8–16 Day Repeat Orbit',
+      temporalResBn: '৮–১৬ দিনে পুনরাবৃত্ত কক্ষপথ',
       accessProtocol: 'USGS Machine-to-Machine (M2M) API',
+      accessProtocolBn: 'USGS মেশিন-টু-মেশিন (M2M) API',
       statusEn: 'Pipeline Schema Ready (Awaiting Backend Ingestion)',
       statusBn: 'পাইপলাইন স্কিমা প্রস্তুত (ব্যাকএন্ড সংযোগ অপেক্ষমাণ)',
       isIngested: false,
@@ -175,10 +191,14 @@ export const DataSourcesPage = () => {
       id: 'power',
       product: t('dataSources.power'),
       provider: 'NASA Langley Research Center',
+      providerBn: 'NASA Langley Research Center',
       variable: t('dataSources.powerParam'),
       spatialRes: '0.5° x 0.5° Global Meteorological Grid',
+      spatialResBn: '০.৫° x ০.৫° বৈশ্বিক আবহাওয়া গ্রিড',
       temporalRes: 'Daily & Hourly Agroclimatology Time-Series',
+      temporalResBn: 'দৈনিক ও ঘণ্টাভিত্তিক কৃষি-আবহাওয়ার সময়ক্রম',
       accessProtocol: 'NASA POWER REST API v2',
+      accessProtocolBn: 'NASA POWER REST API v2',
       statusEn: 'Specification Verified',
       statusBn: 'স্পেসিফিকেশন অনুমোদিত ও প্রস্তুত',
       isIngested: false,
@@ -378,7 +398,7 @@ export const DataSourcesPage = () => {
                   <span style={{ color: 'var(--color-text-secondary)', display: 'block', marginBottom: '2px' }}>
                     {t('dataSources.provider')}:
                   </span>
-                  <strong>{item.provider}</strong>
+                  <strong>{isBangla ? item.providerBn : item.provider}</strong>
                 </div>
                 <div>
                   <span style={{ color: 'var(--color-text-secondary)', display: 'block', marginBottom: '2px' }}>
@@ -390,13 +410,13 @@ export const DataSourcesPage = () => {
                   <span style={{ color: 'var(--color-text-secondary)', display: 'block', marginBottom: '2px' }}>
                     {t('dataSources.resolution')}:
                   </span>
-                  <span>{item.spatialRes} | {item.temporalRes}</span>
+                  <span>{isBangla ? item.spatialResBn : item.spatialRes} | {isBangla ? item.temporalResBn : item.temporalRes}</span>
                 </div>
                 <div>
                   <span style={{ color: 'var(--color-text-secondary)', display: 'block', marginBottom: '2px' }}>
                     {t('dataSources.access')}:
                   </span>
-                  <span>{item.accessProtocol}</span>
+                  <span>{isBangla ? item.accessProtocolBn : item.accessProtocol}</span>
                 </div>
               </div>
 

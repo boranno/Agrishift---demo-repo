@@ -28,7 +28,7 @@ export const ModelEvaluationPage = () => {
         subtitle={t('modelEvaluation.subtitle')}
         badge={<DemoBadge text="Feature 15" />}
         actions={
-          <span className="badge badge-neutral">Model Transparency v0.1</span>
+          <span className="badge badge-neutral">{isBangla ? 'মডেল স্বচ্ছতা v0.1' : 'Model Transparency v0.1'}</span>
         }
         helpText={isBangla
           ? 'এগ্রিশিফট প্ল্যাটফর্মের কৃত্রিম বুদ্ধিমত্তা মডেলের আর্কিটেকচার, প্রশিক্ষণ ডেটাসেটের বিবরণ এবং পারফরম্যান্সের বৈজ্ঞানিক লক্ষ্যমাত্রা এখানে স্বচ্ছভাবে উন্মুক্ত করা হয়েছে।'
@@ -57,19 +57,19 @@ export const ModelEvaluationPage = () => {
             <span style={{ color: 'var(--color-text-secondary)', display: 'block', marginBottom: '2px' }}>
               {t('modelEvaluation.cardModelName')}:
             </span>
-            <strong>{card.modelName}</strong>
+            <strong>{isBangla ? card.modelNameBn : card.modelName}</strong>
           </div>
           <div>
             <span style={{ color: 'var(--color-text-secondary)', display: 'block', marginBottom: '2px' }}>
               {t('modelEvaluation.cardTarget')}:
             </span>
-            <strong>{card.targetTask}</strong>
+            <strong>{isBangla ? card.targetTaskBn : card.targetTask}</strong>
           </div>
           <div style={{ gridColumn: 'span 2' }}>
             <span style={{ color: 'var(--color-text-secondary)', display: 'block', marginBottom: '2px' }}>
               {isBangla ? 'উদ্দিষ্ট ব্যবহারকারী:' : 'Intended Users:'}
             </span>
-            <span>{card.intendedUsers}</span>
+            <span>{isBangla ? card.intendedUsersBn : card.intendedUsers}</span>
           </div>
         </div>
       </div>
@@ -79,9 +79,9 @@ export const ModelEvaluationPage = () => {
         <div className="card" style={{ borderLeft: '4px solid var(--color-primary-700)' }}>
           <div className="card-header">
             <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>
-              Regression Target 1
+              {isBangla ? 'রিগ্রেশন লক্ষ্য ১' : 'Regression Target 1'}
             </span>
-            <span className="badge badge-demo">Target</span>
+            <span className="badge badge-demo">{isBangla ? 'লক্ষ্য' : 'Target'}</span>
           </div>
           <div style={{ fontSize: 'var(--font-size-xl)', fontWeight: 'bold', color: 'var(--color-primary-900)', marginBottom: '0.25rem' }}>
             MAE ≤ 1.2 dS/m
@@ -94,9 +94,9 @@ export const ModelEvaluationPage = () => {
         <div className="card" style={{ borderLeft: '4px solid var(--color-primary-700)' }}>
           <div className="card-header">
             <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>
-              Regression Target 2
+              {isBangla ? 'রিগ্রেশন লক্ষ্য ২' : 'Regression Target 2'}
             </span>
-            <span className="badge badge-demo">Target</span>
+            <span className="badge badge-demo">{isBangla ? 'লক্ষ্য' : 'Target'}</span>
           </div>
           <div style={{ fontSize: 'var(--font-size-xl)', fontWeight: 'bold', color: 'var(--color-primary-900)', marginBottom: '0.25rem' }}>
             RMSE ≤ 1.8 dS/m
@@ -109,9 +109,9 @@ export const ModelEvaluationPage = () => {
         <div className="card" style={{ borderLeft: '4px solid var(--color-primary-700)' }}>
           <div className="card-header">
             <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>
-              Suitability Classification
+              {isBangla ? 'উপযোগিতা শ্রেণিবিন্যাস' : 'Suitability Classification'}
             </span>
-            <span className="badge badge-demo">Target</span>
+            <span className="badge badge-demo">{isBangla ? 'লক্ষ্য' : 'Target'}</span>
           </div>
           <div style={{ fontSize: 'var(--font-size-xl)', fontWeight: 'bold', color: 'var(--color-primary-900)', marginBottom: '0.25rem' }}>
             Macro F1 ≥ 0.82
@@ -133,7 +133,7 @@ export const ModelEvaluationPage = () => {
             </h3>
           </div>
           <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: 'var(--font-size-xs)' }}>
-            {card.plannedTrainingSources.map((src, idx) => (
+            {(isBangla ? card.plannedTrainingSourcesBn : card.plannedTrainingSources).map((src, idx) => (
               <li key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', lineHeight: 1.5 }}>
                 <CheckCircle2 size={14} color="var(--color-primary-700)" style={{ flexShrink: 0, marginTop: '2px' }} />
                 <span>{src}</span>
@@ -158,7 +158,7 @@ export const ModelEvaluationPage = () => {
             fontSize: 'var(--font-size-xs)',
             lineHeight: 1.6
           }}>
-            <strong>{card.validationStrategy.method}</strong>
+            <strong>{isBangla ? card.validationStrategy.methodBn : card.validationStrategy.method}</strong>
             <p style={{ margin: '0.35rem 0 0 0', color: 'var(--color-text-on-cream)' }}>
               {isBangla ? card.validationStrategy.descriptionBn : card.validationStrategy.descriptionEn}
             </p>
@@ -204,4 +204,3 @@ export const ModelEvaluationPage = () => {
 };
 
 export default ModelEvaluationPage;
-

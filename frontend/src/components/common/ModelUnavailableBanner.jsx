@@ -9,6 +9,13 @@ export const ModelUnavailableBanner = ({
   showInputsNote = true
 }) => {
   const { t, isBangla } = useTranslation();
+  const plannedPhaseBn = {
+    'Part 2 & 3 Backend Integration': 'পর্ব ২ ও ৩: ব্যাকএন্ড সংযোজন',
+    'Part 3 (Model Training & Inference API)': 'পর্ব ৩: মডেল প্রশিক্ষণ ও ইনফারেন্স API',
+    'Part 3 (Model Training & Benchmark Evaluation)': 'পর্ব ৩: মডেল প্রশিক্ষণ ও বেঞ্চমার্ক মূল্যায়ন',
+    'Part 2 (Algorithmic Constraint Optimization Engine)': 'পর্ব ২: অ্যালগরিদমিক সীমাবদ্ধতা অপ্টিমাইজেশন ইঞ্জিন',
+    'Part 2 & 3 (Backend & ML Pipeline)': 'পর্ব ২ ও ৩: ব্যাকএন্ড ও মেশিন লার্নিং পাইপলাইন'
+  };
 
   return (
     <div style={{
@@ -59,7 +66,7 @@ export const ModelUnavailableBanner = ({
             padding: '0.15rem 0.5rem',
             borderRadius: 'var(--radius-full)'
           }}>
-            {plannedPhase}
+            {isBangla ? plannedPhaseBn[plannedPhase] || plannedPhase : plannedPhase}
           </span>
         </div>
 
@@ -97,4 +104,3 @@ export const ModelUnavailableBanner = ({
 };
 
 export default ModelUnavailableBanner;
-

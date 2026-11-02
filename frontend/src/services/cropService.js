@@ -278,6 +278,12 @@ export const CROPS_CATALOG = [
  */
 export const evaluateCropSuitability = (crop, soilEc, activeSeason = 'all') => {
   const ec = Number(soilEc) || 4.0;
+  const seasonLabelsBn = {
+    rabi: 'রবি',
+    kharif1: 'খরিপ-১',
+    kharif2: 'খরিপ-২'
+  };
+  const cropSeasonsBn = crop.seasons?.map(season => seasonLabelsBn[season] || season).join(', ') || '';
 
   // Season check
   const seasonMatch = activeSeason === 'all' || !crop.seasons || crop.seasons.includes(activeSeason);
@@ -290,7 +296,7 @@ export const evaluateCropSuitability = (crop, soilEc, activeSeason = 'all') => {
         : `Salinity is safe, but optimal sowing season is ${crop.seasons.join(', ')}.`,
       reasonBn: seasonMatch
         ? `মাটির লবণাক্ততা (${ec.toFixed(1)} dS/m) সহনশীল সীমার (${crop.criticalSalinityEc} dS/m) নিচে রয়েছে।`
-        : `লবণাক্ততা ঠিক আছে, তবে এই ফসলের মূল মৌসুম হলো ${crop.seasons.join(', ')}।`
+        : `লবণাক্ততা ঠিক আছে, তবে এই ফসলের মূল মৌসুম হলো ${cropSeasonsBn}।`
     };
   } else if (ec <= crop.maxSalinityEc) {
     return {
@@ -308,4 +314,3 @@ export const evaluateCropSuitability = (crop, soilEc, activeSeason = 'all') => {
 };
 
 export const getCropsCatalog = () => CROPS_CATALOG;
-

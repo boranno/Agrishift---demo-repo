@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from '../../hooks/useTranslation';
 import { useFarm } from '../../context/FarmContext';
+import { localizeFarmValue } from '../../utils/farmDisplay';
 import { getSalinityPredictionSpec } from '../../services/modelService';
 import PageHeader from '../../components/common/PageHeader';
 import DemoBadge from '../../components/common/DemoBadge';
@@ -30,7 +31,7 @@ export const SalinityPredictionPage = () => {
     <div>
       <PageHeader
         title={t('salinityPrediction.title')}
-        subtitle={`${farm?.upazila || 'Dacope'}, ${farm?.district || 'Khulna'} — ${farm?.aez || 'AEZ 13'}`}
+        subtitle={`${localizeFarmValue(farm?.upazila || 'Dacope', isBangla)}, ${localizeFarmValue(farm?.district || 'Khulna', isBangla)} — ${localizeFarmValue(farm?.aez || 'AEZ 13', isBangla)}`}
         badge={<DemoBadge text="Feature 12" />}
         helpText={isBangla
           ? 'নাসার উপগ্রহ উপাত্ত ও এসআরডিআই মাটির তথ্যকে কাজে লাগিয়ে মাটির লবণাক্ততা (ইসি) পূর্বাভাসের এই ইন্টারফেসটি তৈরি করা হয়েছে। মডেলের প্রশিক্ষণ সম্পন্ন হলে এখানে স্বয়ংক্রিয় পূর্বাভাস প্রদর্শিত হবে।'
@@ -58,7 +59,7 @@ export const SalinityPredictionPage = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <MapPin size={18} color="var(--color-primary-800)" />
           <span style={{ fontSize: 'var(--font-size-sm)', fontWeight: '600' }}>
-            {farm?.upazila}, {farm?.district} ({Number(farm?.latitude).toFixed(4)}°N, {Number(farm?.longitude).toFixed(4)}°E)
+            {localizeFarmValue(farm?.upazila, isBangla)}, {localizeFarmValue(farm?.district, isBangla)} ({Number(farm?.latitude).toFixed(4)}°N, {Number(farm?.longitude).toFixed(4)}°E)
           </span>
         </div>
 
@@ -124,20 +125,20 @@ export const SalinityPredictionPage = () => {
               }}
             >
               <div>
-                <strong>{input.source}: </strong>
-                <span style={{ color: 'var(--color-text-secondary)' }}>{input.parameter}</span>
+                <strong>{isBangla ? input.sourceBn : input.source}: </strong>
+                <span style={{ color: 'var(--color-text-secondary)' }}>{isBangla ? input.parameterBn : input.parameter}</span>
               </div>
 
               <div>
                 {input.ready ? (
                   <span className="badge badge-suitable" style={{ fontSize: '11px' }}>
                     <CheckCircle2 size={12} />
-                    <span>{input.status}</span>
+                    <span>{isBangla ? input.statusBn : input.status}</span>
                   </span>
                 ) : (
                   <span className="badge badge-marginal" style={{ fontSize: '11px' }}>
                     <Clock size={12} />
-                    <span>{input.status}</span>
+                    <span>{isBangla ? input.statusBn : input.status}</span>
                   </span>
                 )}
               </div>
@@ -153,7 +154,7 @@ export const SalinityPredictionPage = () => {
             <Gauge size={18} color="var(--color-primary-800)" />
             <span>{t('salinityPrediction.expectedOutput')}</span>
           </h2>
-          <span className="badge badge-demo">UI Schema Representation</span>
+          <span className="badge badge-demo">{isBangla ? 'ইউআই কাঠামোর নমুনা' : 'UI Schema Representation'}</span>
         </div>
 
         <div style={{
@@ -200,16 +201,16 @@ export const SalinityPredictionPage = () => {
             fontSize: 'var(--font-size-xs)'
           }}>
             <div>
-              <span style={{ color: 'var(--color-text-muted)', display: 'block' }}>Target Variable:</span>
-              <strong>ECe (dS/m at 25°C)</strong>
+              <span style={{ color: 'var(--color-text-muted)', display: 'block' }}>{isBangla ? 'লক্ষ্য চলক:' : 'Target Variable:'}</span>
+              <strong>{isBangla ? 'ECe (dS/m, ২৫°সে)' : 'ECe (dS/m at 25°C)'}</strong>
             </div>
             <div>
-              <span style={{ color: 'var(--color-text-muted)', display: 'block' }}>Confidence Interval:</span>
-              <strong>95% CI (±0.8 dS/m)</strong>
+              <span style={{ color: 'var(--color-text-muted)', display: 'block' }}>{isBangla ? 'নির্ভরযোগ্যতার সীমা:' : 'Confidence Interval:'}</span>
+              <strong>{isBangla ? '৯৫% (±০.৮ dS/m)' : '95% CI (±0.8 dS/m)'}</strong>
             </div>
             <div>
-              <span style={{ color: 'var(--color-text-muted)', display: 'block' }}>Salinity Risk Tier:</span>
-              <strong>Ordinal Category</strong>
+              <span style={{ color: 'var(--color-text-muted)', display: 'block' }}>{isBangla ? 'লবণাক্ততার ঝুঁকির স্তর:' : 'Salinity Risk Tier:'}</span>
+              <strong>{isBangla ? 'ক্রমভিত্তিক শ্রেণি' : 'Ordinal Category'}</strong>
             </div>
           </div>
         </div>
@@ -242,4 +243,3 @@ export const SalinityPredictionPage = () => {
 };
 
 export default SalinityPredictionPage;
-

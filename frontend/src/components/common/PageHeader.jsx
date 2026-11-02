@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { HelpCircle, ChevronDown, ChevronUp } from 'lucide-react';
+import { useTranslation } from '../../hooks/useTranslation';
 
 export const PageHeader = ({
   title,
@@ -9,6 +10,7 @@ export const PageHeader = ({
   helpText
 }) => {
   const [showHelp, setShowHelp] = useState(false);
+  const { t } = useTranslation();
 
   return (
     <div style={{ marginBottom: '1.75rem' }} className="page-header-wrapper">
@@ -32,10 +34,10 @@ export const PageHeader = ({
                 onClick={() => setShowHelp(prev => !prev)}
                 className="btn btn-secondary btn-sm page-header-help-btn"
                 style={{ padding: '0.2rem 0.5rem', borderRadius: 'var(--radius-full)' }}
-                title="Toggle Contextual Help"
+                title={t('common.contextualHelp')}
               >
                 <HelpCircle size={14} />
-                <span style={{ fontSize: '11px' }}>Help</span>
+                <span style={{ fontSize: '11px' }}>{t('common.help')}</span>
               </button>
             )}
           </div>
@@ -80,4 +82,3 @@ export const PageHeader = ({
 };
 
 export default PageHeader;
-

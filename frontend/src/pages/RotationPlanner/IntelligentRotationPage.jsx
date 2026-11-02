@@ -56,7 +56,7 @@ export const IntelligentRotationPage = () => {
         subtitle={t('intelligentRotation.subtitle')}
         badge={<DemoBadge text="Feature 14" />}
         actions={
-          <span className="badge badge-neutral">Part 2 Optimization Engine</span>
+          <span className="badge badge-neutral">{isBangla ? 'পর্ব ২: অপ্টিমাইজেশন ইঞ্জিন' : 'Part 2 Optimization Engine'}</span>
         }
         helpText={isBangla
           ? 'বহু-বছরের ফসল পর্যায়ক্রমের মাধ্যমে কীভাবে মাটির স্বাস্থ্য পুনরুদ্ধার হয় এবং লবণাক্ততা কমে আসে তা এই ইন্টারফেসে উপস্থাপন করা হয়েছে।'
@@ -124,20 +124,20 @@ export const IntelligentRotationPage = () => {
             <span style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 'bold', color: 'var(--color-primary-800)' }}>
               +{((currentTrajectory.year3Om - currentTrajectory.year1Om) / currentTrajectory.year1Om * 100).toFixed(0)}%
             </span>
-            <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>OM Gain over 3 Years</span>
+            <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>{isBangla ? '৩ বছরে জৈব পদার্থের বৃদ্ধি' : 'Organic matter gain over 3 years'}</span>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', fontSize: '11px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span>Year 1 (Baseline):</span>
+              <span>{isBangla ? '১ম বছর (প্রাথমিক):' : 'Year 1 (Baseline):'}</span>
               <strong>{currentTrajectory.year1Om}% OM</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span>Year 2:</span>
+              <span>{isBangla ? '২য় বছর:' : 'Year 2:'}</span>
               <strong>{currentTrajectory.year2Om}% OM</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span>Year 3:</span>
+              <span>{isBangla ? '৩য় বছর:' : 'Year 3:'}</span>
               <strong style={{ color: 'var(--color-suitable-dot)' }}>{currentTrajectory.year3Om}% OM</strong>
             </div>
           </div>
@@ -212,7 +212,7 @@ export const IntelligentRotationPage = () => {
             <span className="badge badge-neutral" style={{ fontSize: '10px', marginBottom: '0.4rem' }}>
               ধাপ ১: খরিপ-১ (গ্রীষ্ম)
             </span>
-            <h4 style={{ fontSize: 'var(--font-size-sm)', marginBottom: '0.35rem' }}>সবুজ সার (ধইঞ্চা)</h4>
+            <h4 style={{ fontSize: 'var(--font-size-sm)', marginBottom: '0.35rem' }}>{isBangla ? 'সবুজ সার (ধইঞ্চা)' : 'Green manure (Sesbania)'}</h4>
             <p style={{ fontSize: '11px', color: 'var(--color-text-secondary)', lineHeight: 1.5 }}>
               মাটিতে মিশিয়ে দিলে জৈব কার্বন যোগ হয় এবং গ্রীষ্মের তীব্র রোদে মাটির ওপর লবণের আস্তরণ জমা বন্ধ হয়।
             </p>
@@ -222,7 +222,7 @@ export const IntelligentRotationPage = () => {
             <span className="badge badge-neutral" style={{ fontSize: '10px', marginBottom: '0.4rem' }}>
               ধাপ ২: খরিপ-২ (বর্ষা)
             </span>
-            <h4 style={{ fontSize: 'var(--font-size-sm)', marginBottom: '0.35rem' }}>রোপা আমন (ব্রি ধান৭৩)</h4>
+            <h4 style={{ fontSize: 'var(--font-size-sm)', marginBottom: '0.35rem' }}>{isBangla ? 'রোপা আমন (ব্রি ধান৭৩)' : 'Transplanted Aman (BRRI dhan73)'}</h4>
             <p style={{ fontSize: '11px', color: 'var(--color-text-secondary)', lineHeight: 1.5 }}>
               বর্ষার পানিতে লবণ ধুয়ে যায়; আগের ধাপের ধইঞ্চার ফলে মাটিতে প্রয়োজনীয় নাইট্রোজেন প্রস্তুত থাকে।
             </p>
@@ -232,7 +232,7 @@ export const IntelligentRotationPage = () => {
             <span className="badge badge-neutral" style={{ fontSize: '10px', marginBottom: '0.4rem' }}>
               ধাপ ৩: রবি (শীতকাল)
             </span>
-            <h4 style={{ fontSize: 'var(--font-size-sm)', marginBottom: '0.35rem' }}>সূর্যমুখী / রিলে ডাল</h4>
+            <h4 style={{ fontSize: 'var(--font-size-sm)', marginBottom: '0.35rem' }}>{isBangla ? 'সূর্যমুখী / রিলে ডাল' : 'Sunflower / relay pulse'}</h4>
             <p style={{ fontSize: '11px', color: 'var(--color-text-secondary)', lineHeight: 1.5 }}>
               গভীর শিকড়ের সাহায্যে মাটির নিচের আর্দ্রতা নেয় এবং বোরো ধানের বিপুল মিষ্টি পানির সেচ সংকট এড়ায়।
             </p>
@@ -244,4 +244,3 @@ export const IntelligentRotationPage = () => {
 };
 
 export default IntelligentRotationPage;
-

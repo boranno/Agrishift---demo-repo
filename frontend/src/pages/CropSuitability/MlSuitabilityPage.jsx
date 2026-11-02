@@ -65,7 +65,7 @@ export const MlSuitabilityPage = () => {
             <BarChart3 size={18} color="var(--color-primary-800)" />
             <span>{t('mlSuitability.factorBreakdownTitle')}</span>
           </h2>
-          <span className="badge badge-demo">Planned SHAP Architecture</span>
+          <span className="badge badge-demo">{isBangla ? 'পরিকল্পিত SHAP কাঠামো' : 'Planned SHAP Architecture'}</span>
         </div>
 
         <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginBottom: '1.25rem' }}>
@@ -104,20 +104,20 @@ export const MlSuitabilityPage = () => {
 
         <div className="grid grid-cols-4" style={{ fontSize: 'var(--font-size-xs)' }}>
           <div style={{ backgroundColor: 'var(--color-bg-main)', padding: '0.75rem', borderRadius: 'var(--radius-md)' }}>
-            <strong>১. মাটির লবণাক্ততা স্তর</strong>
-            <div style={{ color: 'var(--color-text-secondary)', marginTop: '2px' }}>SRDI গ্রাউন্ড টেস্ট ও উপগ্রহ অনুমান</div>
+            <strong>{isBangla ? '১. মাটির লবণাক্ততার স্তর' : '1. Soil salinity level'}</strong>
+            <div style={{ color: 'var(--color-text-secondary)', marginTop: '2px' }}>{isBangla ? 'এসআরডিআই-এর মাঠপর্যায়ের পরীক্ষা ও উপগ্রহের অনুমান' : 'SRDI ground tests and satellite estimates'}</div>
           </div>
           <div style={{ backgroundColor: 'var(--color-bg-main)', padding: '0.75rem', borderRadius: 'var(--radius-md)' }}>
-            <strong>২. মাটির গঠন ও অম্লমান</strong>
-            <div style={{ color: 'var(--color-text-secondary)', marginTop: '2px' }}>পিএইচ, জৈব সার ও পুষ্টি উপাদান</div>
+            <strong>{isBangla ? '২. মাটির গঠন ও অম্লমান' : '2. Soil texture and acidity'}</strong>
+            <div style={{ color: 'var(--color-text-secondary)', marginTop: '2px' }}>{isBangla ? 'পিএইচ, জৈব পদার্থ ও পুষ্টি উপাদান' : 'pH, organic matter, and nutrients'}</div>
           </div>
           <div style={{ backgroundColor: 'var(--color-bg-main)', padding: '0.75rem', borderRadius: 'var(--radius-md)' }}>
-            <strong>৩. উপগ্রহ আর্দ্রতা স্তর</strong>
-            <div style={{ color: 'var(--color-text-secondary)', marginTop: '2px' }}>NASA SMAP ৩৬ কিমি আর্দ্রতা টাইম-সিরিজ</div>
+            <strong>{isBangla ? '৩. উপগ্রহ থেকে মাটির আর্দ্রতা' : '3. Satellite soil moisture'}</strong>
+            <div style={{ color: 'var(--color-text-secondary)', marginTop: '2px' }}>{isBangla ? 'নাসা SMAP-এর ৩৬ কিমি আর্দ্রতার সময়ভিত্তিক তথ্য' : 'NASA SMAP 36 km soil-moisture time series'}</div>
           </div>
           <div style={{ backgroundColor: 'var(--color-bg-main)', padding: '0.75rem', borderRadius: 'var(--radius-md)' }}>
-            <strong>৪. আবহাওয়া ও তাপমাত্রা</strong>
-            <div style={{ color: 'var(--color-text-secondary)', marginTop: '2px' }}>NASA GPM বৃষ্টিপাত ও পাওয়ার তাপমাত্রা</div>
+            <strong>{isBangla ? '৪. আবহাওয়া ও তাপমাত্রা' : '4. Weather and temperature'}</strong>
+            <div style={{ color: 'var(--color-text-secondary)', marginTop: '2px' }}>{isBangla ? 'নাসা GPM বৃষ্টিপাত ও POWER তাপমাত্রার তথ্য' : 'NASA GPM rainfall and POWER temperature data'}</div>
           </div>
         </div>
       </div>
@@ -126,4 +126,3 @@ export const MlSuitabilityPage = () => {
 };
 
 export default MlSuitabilityPage;
-

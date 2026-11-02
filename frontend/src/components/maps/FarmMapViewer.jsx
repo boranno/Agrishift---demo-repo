@@ -1070,7 +1070,7 @@ export const FarmMapViewer = ({
             {currentLayer.isSatellite ? 'Imagery: Esri World Imagery / USGS' : 'Tiles: OpenStreetMap Contributors / CARTO'}
           </span>
           <span style={{ color: 'var(--color-border)' }}>|</span>
-          <span>Engine: MapLibre GL JS</span>
+          <span>{isBangla ? 'মানচিত্র ইঞ্জিন: MapLibre GL JS' : 'Engine: MapLibre GL JS'}</span>
         </div>
 
         <div style={{ fontSize: '10px', color: 'var(--color-text-muted)' }}>

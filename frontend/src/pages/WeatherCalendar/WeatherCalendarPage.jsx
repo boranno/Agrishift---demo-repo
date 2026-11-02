@@ -140,9 +140,11 @@ export const WeatherCalendarPage = () => {
               type="button"
               onClick={() => setSimulatedState(prev => prev === 'success' ? 'loading' : prev === 'loading' ? 'nodata' : 'success')}
               className="btn btn-secondary btn-sm"
-              title="Toggle State (Success / Loading / Empty)"
+              title={isBangla ? 'অবস্থা পরিবর্তন করুন (সফল / লোড হচ্ছে / খালি)' : 'Toggle State (Success / Loading / Empty)'}
             >
-              <span>State: {simulatedState}</span>
+              <span>{isBangla ? 'অবস্থা:' : 'State:'} {isBangla
+                ? { success: 'সফল', loading: 'লোড হচ্ছে', nodata: 'তথ্য নেই' }[simulatedState]
+                : simulatedState}</span>
             </button>
           </div>
         }
@@ -292,7 +294,7 @@ export const WeatherCalendarPage = () => {
               color: 'var(--color-text-secondary)',
               textAlign: 'center'
             }}>
-              <div style={{ textAlign: 'left', paddingLeft: '0.5rem' }}>ফসল / Crop</div>
+              <div style={{ textAlign: 'left', paddingLeft: '0.5rem' }}>{isBangla ? 'ফসল' : 'Crop'}</div>
               {(isBangla ? monthsBn : monthsEn).map((m, idx) => (
                 <div key={idx} style={{
                   backgroundColor: idx >= 1 && idx <= 4 ? 'rgba(239, 68, 68, 0.08)' : 'transparent',
@@ -345,7 +347,7 @@ export const WeatherCalendarPage = () => {
                       backgroundColor: 'rgba(239, 68, 68, 0.12)',
                       borderLeft: '1px dashed #EF4444',
                       borderRight: '1px dashed #EF4444'
-                    }} title="Peak Salinity Risk Window" />
+                    }} title={isBangla ? 'লবণাক্ততার সর্বোচ্চ ঝুঁকির সময়' : 'Peak Salinity Risk Window'} />
 
                     {/* Sowing Bar */}
                     <div
@@ -487,4 +489,3 @@ export const WeatherCalendarPage = () => {
 };
 
 export default WeatherCalendarPage;
-

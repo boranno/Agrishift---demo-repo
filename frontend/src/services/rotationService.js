@@ -11,7 +11,9 @@ export const ROTATION_PATTERNS = [
     suitabilityScore: 92,
     priorities: ['soil', 'saline'],
     soilSalinitySuitability: 'High (tolerates 4.0–8.0 dS/m)',
+    soilSalinitySuitabilityBn: 'উচ্চ (৪.০–৮.০ dS/m সহনশীল)',
     waterRequirementLevel: 'Low to Moderate',
+    waterRequirementLevelBn: 'কম থেকে মাঝারি',
     seasons: [
       {
         seasonKey: 'kharif1',
@@ -57,7 +59,9 @@ export const ROTATION_PATTERNS = [
     suitabilityScore: 86,
     priorities: ['water', 'soil'],
     soilSalinitySuitability: 'Moderate (tolerates up to 5.5 dS/m)',
+    soilSalinitySuitabilityBn: 'মাঝারি (৫.৫ dS/m পর্যন্ত সহনশীল)',
     waterRequirementLevel: 'Very Low (Zero to 1 supplementary irrigation)',
+    waterRequirementLevelBn: 'খুব কম (০–১ বার সম্পূরক সেচ)',
     seasons: [
       {
         seasonKey: 'kharif1',
@@ -103,7 +107,9 @@ export const ROTATION_PATTERNS = [
     suitabilityScore: 78,
     priorities: ['yield', 'saline'],
     soilSalinitySuitability: 'Moderate to High (Requires canal flushing)',
+    soilSalinitySuitabilityBn: 'মাঝারি থেকে উচ্চ (খালের পানি দিয়ে লবণ ধুয়ে ফেলা প্রয়োজন)',
     waterRequirementLevel: 'High (Needs freshwater storage pond)',
+    waterRequirementLevelBn: 'উচ্চ (মিষ্টি পানির পুকুর প্রয়োজন)',
     seasons: [
       {
         seasonKey: 'kharif1',
@@ -267,4 +273,3 @@ export const getRotationPatterns = (priority = 'all') => {
 };
 
 export const getComparisonPlans = () => COMPARISON_PLANS;
-

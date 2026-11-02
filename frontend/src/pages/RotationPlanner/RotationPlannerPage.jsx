@@ -315,9 +315,9 @@ export const RotationPlannerPage = () => {
                     </div>
 
                     <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.35rem', fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', flexWrap: 'wrap' }}>
-                      <span><strong>{isBangla ? 'লবণ সহনশীলতা:' : 'Salinity Tolerance:'}</strong> {pattern.soilSalinitySuitability}</span>
+                      <span><strong>{isBangla ? 'লবণ সহনশীলতা:' : 'Salinity Tolerance:'}</strong> {isBangla ? pattern.soilSalinitySuitabilityBn : pattern.soilSalinitySuitability}</span>
                       <span>•</span>
-                      <span><strong>{isBangla ? 'পানির চাহিদা:' : 'Water Need:'}</strong> {pattern.waterRequirementLevel}</span>
+                      <span><strong>{isBangla ? 'পানির চাহিদা:' : 'Water Need:'}</strong> {isBangla ? pattern.waterRequirementLevelBn : pattern.waterRequirementLevel}</span>
                     </div>
                   </div>
 

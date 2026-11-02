@@ -438,10 +438,10 @@ export const FarmMapPage = () => {
                 onChange={e => setSoilType(e.target.value)}
                 className="form-select"
               >
-                <option value="Clay Loam (Ganges Alluvium)">Clay Loam (গঙ্গা পলি দোআঁশ)</option>
-                <option value="Saline Heavy Clay">Saline Heavy Clay (ভারী লবণাক্ত এঁটেল)</option>
-                <option value="Silty Clay Loam">Silty Clay Loam (পলি এঁটেল দোআঁশ)</option>
-                <option value="Sandy Loam / Coastal Char">Sandy Loam / Char Soil (বেলে দোআঁশ / চরের মাটি)</option>
+                <option value="Clay Loam (Ganges Alluvium)">{isBangla ? 'গঙ্গা পলির দোআঁশ' : 'Clay Loam (Ganges Alluvium)'}</option>
+                <option value="Saline Heavy Clay">{isBangla ? 'ভারী লবণাক্ত এঁটেল মাটি' : 'Saline Heavy Clay'}</option>
+                <option value="Silty Clay Loam">{isBangla ? 'পলি এঁটেল দোআঁশ' : 'Silty Clay Loam'}</option>
+                <option value="Sandy Loam / Coastal Char">{isBangla ? 'বেলে দোআঁশ / উপকূলীয় চর মাটি' : 'Sandy Loam / Coastal Char'}</option>
               </select>
             </div>
 
@@ -455,10 +455,10 @@ export const FarmMapPage = () => {
                 onChange={e => setWaterSource(e.target.value)}
                 className="form-select"
               >
-                <option value="Rainfed + Pond Storage (Scarce dry-season water)">Rainfed + Pond Freshwater (বৃষ্টি ও পুকুরের মিষ্টি পানি)</option>
-                <option value="Canal Irrigation (Moderate Salinity 2-5 dS/m)">Canal Water / খালের পানি (মাঝারি লবণাক্ততা ২-৫ dS/m)</option>
-                <option value="Deep Tube-well (Freshwater)">Deep Tube-well / গভীর নলকূপ (মিষ্টি পানি)</option>
-                <option value="Rainfed Only (Zero Dry-Season Water)">Rainfed Only / শুধু বৃষ্টির পানি (শীতকালে সেচ নেই)</option>
+                <option value="Rainfed + Pond Storage (Scarce dry-season water)">{isBangla ? 'বৃষ্টির পানি ও পুকুরের মজুত মিষ্টি পানি' : 'Rainfed + Pond Freshwater'}</option>
+                <option value="Canal Irrigation (Moderate Salinity 2-5 dS/m)">{isBangla ? 'খালের পানি (মাঝারি লবণাক্ততা ২–৫ dS/m)' : 'Canal Water (Moderate Salinity 2–5 dS/m)'}</option>
+                <option value="Deep Tube-well (Freshwater)">{isBangla ? 'গভীর নলকূপের মিষ্টি পানি' : 'Deep Tube-well (Freshwater)'}</option>
+                <option value="Rainfed Only (Zero Dry-Season Water)">{isBangla ? 'শুধু বৃষ্টির পানি (শুকনো মৌসুমে সেচ নেই)' : 'Rainfed Only (No Dry-Season Water)'}</option>
               </select>
             </div>
 

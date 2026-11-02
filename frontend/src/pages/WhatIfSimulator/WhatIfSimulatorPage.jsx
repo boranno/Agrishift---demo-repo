@@ -120,11 +120,11 @@ export const WhatIfSimulatorPage = () => {
               onChange={e => setSelectedCrop(e.target.value)}
               className="form-select"
             >
-              <option value="crop-sunflower">সূর্যমুখী / Sunflower (লবণ-সহনশীল ৮.৫ dS/m)</option>
-              <option value="crop-brri67">ব্রি ধান৬৭ বোরো / BRRI dhan67 Boro (৮ dS/m)</option>
-              <option value="crop-mustard">সরিষা / Mustard (বারি সরিষা-১৪, ৫.৫ dS/m)</option>
-              <option value="crop-mungbean">মুগডাল / Mungbean (৪ dS/m)</option>
-              <option value="crop-potato">আলু / Potato (সংবেদনশীল ২.৫ dS/m)</option>
+              <option value="crop-sunflower">{isBangla ? 'সূর্যমুখী (লবণ সহনশীলতা ৮.৫ dS/m)' : 'Sunflower (salinity tolerance 8.5 dS/m)'}</option>
+              <option value="crop-brri67">{isBangla ? 'ব্রি ধান৬৭ বোরো (৮ dS/m)' : 'BRRI dhan67 Boro (8 dS/m)'}</option>
+              <option value="crop-mustard">{isBangla ? 'বারি সরিষা-১৪ (৫.৫ dS/m)' : 'BARI Mustard-14 (5.5 dS/m)'}</option>
+              <option value="crop-mungbean">{isBangla ? 'মুগডাল (৪ dS/m)' : 'Mungbean (4 dS/m)'}</option>
+              <option value="crop-potato">{isBangla ? 'আলু (সংবেদনশীল, ২.৫ dS/m)' : 'Potato (sensitive, 2.5 dS/m)'}</option>
             </select>
           </div>
 
@@ -151,9 +151,9 @@ export const WhatIfSimulatorPage = () => {
               style={{ width: '100%', accentColor: 'var(--color-primary-800)' }}
             />
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: 'var(--color-text-muted)' }}>
-              <span>১.০ (স্বাভাবিক)</span>
-              <span>৮.০ (মাঝারি লবণ)</span>
-              <span>১৬.০ (তীব্র লবণাক্ত)</span>
+              <span>{isBangla ? '১.০ (স্বাভাবিক)' : '1.0 (Normal)'}</span>
+              <span>{isBangla ? '৮.০ (মাঝারি লবণাক্ততা)' : '8.0 (Moderate salinity)'}</span>
+              <span>{isBangla ? '১৬.০ (তীব্র লবণাক্ততা)' : '16.0 (Severe salinity)'}</span>
             </div>
           </div>
 
@@ -178,9 +178,9 @@ export const WhatIfSimulatorPage = () => {
               style={{ width: '100%', accentColor: 'var(--color-primary-800)' }}
             />
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: 'var(--color-text-muted)' }}>
-              <span>-৪০% (তীব্র খরা)</span>
-              <span>০% (স্বাভাবিক বৃষ্টি)</span>
-              <span>+৪০% (অতিবৃষ্টি)</span>
+              <span>{isBangla ? '-৪০% (তীব্র খরা)' : '-40% (Severe drought)'}</span>
+              <span>{isBangla ? '০% (স্বাভাবিক বৃষ্টি)' : '0% (Normal rainfall)'}</span>
+              <span>{isBangla ? '+৪০% (অতিবৃষ্টি)' : '+40% (Excess rainfall)'}</span>
             </div>
           </div>
 
@@ -195,9 +195,9 @@ export const WhatIfSimulatorPage = () => {
               onChange={e => setIrrigationWaterQuality(e.target.value)}
               className="form-select"
             >
-              <option value="pond_fresh">Pond Freshwater Storage (মিষ্টি পুকুরের পানি &lt;1.5 dS/m)</option>
-              <option value="canal_brackish">Tidal Canal Brackish Water (লবণাক্ত খালের পানি 3-6 dS/m)</option>
-              <option value="rainfed_only">Rainfed Only (কোনো শুকনো সেচ সুবিধা নেই)</option>
+              <option value="pond_fresh">{isBangla ? 'পুকুরের মিষ্টি পানি (১.৫ dS/m-এর কম)' : 'Pond Freshwater Storage (<1.5 dS/m)'}</option>
+              <option value="canal_brackish">{isBangla ? 'জোয়ারভাটার খালের লবণাক্ত পানি (৩–৬ dS/m)' : 'Tidal Canal Brackish Water (3–6 dS/m)'}</option>
+              <option value="rainfed_only">{isBangla ? 'শুধু বৃষ্টিনির্ভর (শুকনো মৌসুমে সেচ নেই)' : 'Rainfed Only (No dry-season irrigation)'}</option>
             </select>
           </div>
 
@@ -331,4 +331,3 @@ export const WhatIfSimulatorPage = () => {
 };
 
 export default WhatIfSimulatorPage;
-

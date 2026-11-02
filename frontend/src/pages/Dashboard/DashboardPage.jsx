@@ -38,6 +38,7 @@ import {
 import { useTranslation } from '../../hooks/useTranslation';
 import { useFarm } from '../../context/FarmContext';
 import { COMPARISON_PLANS } from '../../services/rotationService';
+import { localizeFarmValue } from '../../utils/farmDisplay';
 import PageHeader from '../../components/common/PageHeader';
 import DemoBadge from '../../components/common/DemoBadge';
 import StatusBadge from '../../components/common/StatusBadge';
@@ -244,7 +245,7 @@ export const DashboardPage = () => {
     <div>
       <PageHeader
         title={t('dashboard.title')}
-        subtitle={`${farm.upazila}, ${farm.district} — ${farm.aez}`}
+        subtitle={`${localizeFarmValue(farm.upazila, isBangla)}, ${localizeFarmValue(farm.district, isBangla)} — ${localizeFarmValue(farm.aez, isBangla)}`}
         badge={<DemoBadge text="NASA Decision Support" />}
         actions={
           <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -295,13 +296,13 @@ export const DashboardPage = () => {
                 <Compass size={12} />
                 <span>{Number(farm.latitude || 22.5721).toFixed(4)}°N, {Number(farm.longitude || 89.5105).toFixed(4)}°E</span>
                 <span>•</span>
-                <span>{farm.soilType || 'Clay Loam (Ganges Alluvium)'}</span>
+                <span>{localizeFarmValue(farm.soilType || 'Clay Loam (Ganges Alluvium)', isBangla)}</span>
               </div>
               <h2 style={{ fontSize: '1.65rem', fontWeight: 'bold', color: '#FFFFFF', marginBottom: '0.25rem' }}>
-                {farm.upazila}, {farm.district}
+                {localizeFarmValue(farm.upazila, isBangla)}, {localizeFarmValue(farm.district, isBangla)}
               </h2>
               <p style={{ fontSize: 'var(--font-size-xs)', color: '#D1FAE5' }}>
-                {farm.aez} {isBangla ? '— লবণাক্ত পানির অনুপ্রবেশ প্রবণ উপকূলীয় এলাকা' : '— Saline Tidal Surge Inundation Delta Zone'}
+                {localizeFarmValue(farm.aez, isBangla)} {isBangla ? '— লবণাক্ত পানির অনুপ্রবেশ প্রবণ উপকূলীয় এলাকা' : '— Saline Tidal Surge Inundation Delta Zone'}
               </p>
             </div>
 
@@ -749,7 +750,7 @@ export const DashboardPage = () => {
                 </div>
                 <div style={{ backgroundColor: '#FFFFFF', padding: '0.5rem', borderRadius: 'var(--radius-sm)', border: '1px solid #CCFBF1' }}>
                   <div style={{ color: 'var(--color-text-secondary)', fontSize: '10px' }}>{isBangla ? 'পানির সাশ্রয়' : 'Water Conserved'}</div>
-                  <strong style={{ color: '#0284C7', fontSize: '13px' }}>65% Less Water</strong>
+                  <strong style={{ color: '#0284C7', fontSize: '13px' }}>{isBangla ? '৬৫% কম পানি' : '65% less water'}</strong>
                 </div>
               </div>
 

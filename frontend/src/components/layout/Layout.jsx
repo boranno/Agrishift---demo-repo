@@ -37,7 +37,7 @@ export const Layout = ({ children, isPublicLanding = false }) => {
     };
 
     return (
-      <nav aria-label="Breadcrumb" style={{
+      <nav aria-label={isBangla ? 'পথনির্দেশ' : 'Breadcrumb'} style={{
         display: 'flex',
         alignItems: 'center',
         gap: '0.4rem',

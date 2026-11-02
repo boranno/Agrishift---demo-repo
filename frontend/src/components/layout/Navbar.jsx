@@ -3,16 +3,13 @@ import { Link, useLocation } from 'react-router-dom';
 import { Sprout, Globe, Menu, X, MapPin, AlertTriangle, Layers } from 'lucide-react';
 import { useTranslation } from '../../hooks/useTranslation';
 import { useFarm } from '../../context/FarmContext';
+import { localizeFarmValue } from '../../utils/farmDisplay';
 
 export const Navbar = () => {
   const { t, language, setLanguage, isBangla } = useTranslation();
   const { farm } = useFarm();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  const toggleLanguage = () => {
-    setLanguage(language === 'bn' ? 'en' : 'bn');
-  };
 
   const navLinks = [
     { to: '/', label: t('nav.home') },
@@ -109,33 +106,34 @@ export const Navbar = () => {
             >
               <MapPin size={13} color="var(--color-primary-700)" />
               <span style={{ maxWidth: '160px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {farm.upazila}, {farm.district}
+                {localizeFarmValue(farm.upazila, isBangla)}, {localizeFarmValue(farm.district, isBangla)}
               </span>
             </Link>
           )}
 
-          {/* Bilingual Language Selector Switcher */}
-          <button
-            type="button"
-            onClick={toggleLanguage}
-            className="btn btn-secondary btn-sm"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.4rem',
-              fontWeight: 'var(--font-weight-semibold)',
-              padding: '0.4rem 0.85rem',
-              backgroundColor: 'var(--color-bg-cream)',
-              borderColor: 'var(--color-border)',
-              borderRadius: 'var(--radius-full)',
-              color: 'var(--color-primary-900)'
-            }}
-            aria-label={isBangla ? 'Switch to English' : 'বাংলায় পরিবর্তন করুন'}
-            title={isBangla ? 'Switch to English' : 'বাংলা ভাষায় দেখুন'}
+          <div
+            className="language-switch"
+            role="group"
+            aria-label={isBangla ? 'ভাষা নির্বাচন করুন' : 'Choose language'}
           >
-            <Globe size={15} color="var(--color-primary-800)" />
-            <span>{language === 'bn' ? 'English' : 'বাংলা'}</span>
-          </button>
+            <Globe size={15} className="language-switch-icon" aria-hidden="true" />
+            <button
+              type="button"
+              onClick={() => setLanguage('en')}
+              className={`language-switch-option${language === 'en' ? ' is-active' : ''}`}
+              aria-pressed={language === 'en'}
+            >
+              English
+            </button>
+            <button
+              type="button"
+              onClick={() => setLanguage('bn')}
+              className={`language-switch-option${language === 'bn' ? ' is-active' : ''}`}
+              aria-pressed={language === 'bn'}
+            >
+              বাংলা
+            </button>
+          </div>
 
           {/* Mobile Menu Toggle Button */}
           <button
@@ -175,7 +173,7 @@ export const Navbar = () => {
               <MapPin size={15} color="var(--color-primary-800)" />
               <span>
                 <strong>{isBangla ? 'সক্রিয় খামার: ' : 'Active Farm: '}</strong>
-                {farm.upazila}, {farm.district} ({farm.aez})
+                {localizeFarmValue(farm.upazila, isBangla)}, {localizeFarmValue(farm.district, isBangla)} ({localizeFarmValue(farm.aez, isBangla)})
               </span>
             </div>
           )}

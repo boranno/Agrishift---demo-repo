@@ -167,7 +167,7 @@ export const HomePage = () => {
                   border: '1px solid rgba(255, 255, 255, 0.2)'
                 }}>
                   <div style={{ fontSize: '1.4rem', fontWeight: 'bold', color: '#FFFFFF' }}>
-                    ১০.৫+ <span style={{ fontSize: 'var(--font-size-xs)', fontWeight: 'normal', color: '#A7F3D0' }}>লক্ষ হে.</span>
+                    {isBangla ? '১০.৫+' : '1.05M+'} <span style={{ fontSize: 'var(--font-size-xs)', fontWeight: 'normal', color: '#A7F3D0' }}>{isBangla ? 'লক্ষ হে.' : 'hectares'}</span>
                   </div>
                   <div style={{ fontSize: '11px', color: '#D1FAE5', marginTop: '2px' }}>
                     {isBangla ? 'উপকূলীয় লবণাক্ত জমি' : 'Saline Coastal Farmland'}
@@ -182,7 +182,7 @@ export const HomePage = () => {
                   border: '1px solid rgba(255, 255, 255, 0.2)'
                 }}>
                   <div style={{ fontSize: '1.4rem', fontWeight: 'bold', color: '#FFFFFF' }}>
-                    ২৫+ <span style={{ fontSize: 'var(--font-size-xs)', fontWeight: 'normal', color: '#A7F3D0' }}>ফসল</span>
+                    {isBangla ? '২৫+' : '25+'} <span style={{ fontSize: 'var(--font-size-xs)', fontWeight: 'normal', color: '#A7F3D0' }}>{isBangla ? 'ফসল' : 'crops'}</span>
                   </div>
                   <div style={{ fontSize: '11px', color: '#D1FAE5', marginTop: '2px' }}>
                     {isBangla ? 'মূল্যায়িত লবণ সহনশীলতা' : 'Evaluated Crop Profiles'}
@@ -197,7 +197,7 @@ export const HomePage = () => {
                   border: '1px solid rgba(255, 255, 255, 0.2)'
                 }}>
                   <div style={{ fontSize: '1.4rem', fontWeight: 'bold', color: '#FFFFFF' }}>
-                    ৩ <span style={{ fontSize: 'var(--font-size-xs)', fontWeight: 'normal', color: '#A7F3D0' }}>মৌসুম</span>
+                    {isBangla ? '৩' : '3'} <span style={{ fontSize: 'var(--font-size-xs)', fontWeight: 'normal', color: '#A7F3D0' }}>{isBangla ? 'মৌসুম' : 'seasons'}</span>
                   </div>
                   <div style={{ fontSize: '11px', color: '#D1FAE5', marginTop: '2px' }}>
                     {isBangla ? 'টেকসই পর্যায়ক্রম পরিকল্পনা' : 'Dynamic Crop Rotations'}
@@ -314,13 +314,13 @@ export const HomePage = () => {
                   fontSize: 'var(--font-size-xs)'
                 }}>
                   <div>
-                    <strong style={{ fontSize: '1.1rem', color: 'var(--color-primary-900)' }}>১০.৫+ লক্ষ হেক্টর</strong>
+                    <strong style={{ fontSize: '1.1rem', color: 'var(--color-primary-900)' }}>{isBangla ? '১০.৫+ লক্ষ হেক্টর' : '1.05M+ hectares'}</strong>
                     <div style={{ color: 'var(--color-text-secondary)', marginTop: '2px' }}>
                       {isBangla ? 'লবণাক্ত জমি (উপকূলীয় ১৯ জেলা)' : 'Salt-affected land in 19 districts'}
                     </div>
                   </div>
                   <div>
-                    <strong style={{ fontSize: '1.1rem', color: 'var(--color-primary-900)' }}>৪–১৬+ dS/m</strong>
+                    <strong style={{ fontSize: '1.1rem', color: 'var(--color-primary-900)' }}>{isBangla ? '৪–১৬+ dS/m' : '4–16+ dS/m'}</strong>
                     <div style={{ color: 'var(--color-text-secondary)', marginTop: '2px' }}>
                       {isBangla ? 'শুষ্ক মৌসুমের মাটির বিদ্যুৎ পরিবাহিতা (EC)' : 'Dry season electrical conductivity'}
                     </div>
@@ -517,19 +517,19 @@ export const HomePage = () => {
                     <g transform="translate(140, 55)">
                       <circle cx="0" cy="0" r="20" fill="#15803D" />
                       <circle cx="0" cy="0" r="16" fill="#86EFAC" />
-                      <text x="0" y="4" fontSize="8" fontWeight="bold" textAnchor="middle" fill="#065F46">K-1</text>
+                      <text x="0" y="4" fontSize="8" fontWeight="bold" textAnchor="middle" fill="#065F46">{isBangla ? 'খ-১' : 'K-1'}</text>
                     </g>
                     {/* Season 2 Plot (Right): Aman Rice */}
                     <g transform="translate(195, 115)">
                       <circle cx="0" cy="0" r="20" fill="#166534" />
                       <circle cx="0" cy="0" r="16" fill="#DCFCE7" />
-                      <text x="0" y="4" fontSize="8" fontWeight="bold" textAnchor="middle" fill="#14532D">K-2</text>
+                      <text x="0" y="4" fontSize="8" fontWeight="bold" textAnchor="middle" fill="#14532D">{isBangla ? 'খ-২' : 'K-2'}</text>
                     </g>
                     {/* Season 3 Plot (Left): Rabi Sunflower */}
                     <g transform="translate(85, 115)">
                       <circle cx="0" cy="0" r="20" fill="#D97706" />
                       <circle cx="0" cy="0" r="16" fill="#FEF08A" />
-                      <text x="0" y="4" fontSize="8" fontWeight="bold" textAnchor="middle" fill="#92400E">RABI</text>
+                      <text x="0" y="4" fontSize="8" fontWeight="bold" textAnchor="middle" fill="#92400E">{isBangla ? 'রবি' : 'RABI'}</text>
                     </g>
                     {/* Flow Direction Arrows */}
                     <path d="M 160,65 Q 185,80 190,95" fill="none" stroke="#059669" strokeWidth="3" strokeDasharray="4 3" />
@@ -538,7 +538,7 @@ export const HomePage = () => {
                     {/* Center Rotation Badge */}
                     <g transform="translate(140, 100)">
                       <rect x="-35" y="-10" width="70" height="20" rx="10" fill="#78350F" />
-                      <text x="0" y="4" fontSize="9" fontWeight="bold" textAnchor="middle" fill="#FEF3C7">3-CYCLE</text>
+                      <text x="0" y="4" fontSize="9" fontWeight="bold" textAnchor="middle" fill="#FEF3C7">{isBangla ? '৩-মৌসুম' : '3-CYCLE'}</text>
                     </g>
                   </svg>
                   <span style={{
@@ -567,7 +567,7 @@ export const HomePage = () => {
                     borderRadius: 'var(--radius-sm)',
                     boxShadow: '0 1px 4px rgba(0,0,0,0.1)'
                   }}>
-                    Dynamic Flywheel
+                    {isBangla ? 'গতিশীল ফসল চক্র' : 'Dynamic Flywheel'}
                   </span>
                 </div>
 
@@ -605,7 +605,7 @@ export const HomePage = () => {
                       <polygon points="20,40 35,32 35,10 20,18" fill="#64748B" />
                       <polygon points="35,32 50,40 50,18 35,10" fill="#475569" />
                       <polygon points="20,18 35,10 50,18 35,26" fill="#94A3B8" />
-                      <text x="35" y="0" fontSize="8" fontWeight="bold" textAnchor="middle" fill="#64748B">BASELINE</text>
+                      <text x="35" y="0" fontSize="8" fontWeight="bold" textAnchor="middle" fill="#64748B">{isBangla ? 'প্রাথমিক' : 'BASELINE'}</text>
                     </g>
                     {/* Pillar 2: Soil Health (Center Elevated) */}
                     <g transform="translate(105, 50)">
@@ -614,19 +614,19 @@ export const HomePage = () => {
                       <polygon points="35,21 55,10 75,21 55,32" fill="#4ADE80" />
                       <circle cx="55" cy="-2" r="12" fill="#DCFCE7" stroke="#16A34A" strokeWidth="2" />
                       <path d="M 50,-2 L 53,1 L 60,-5" fill="none" stroke="#15803D" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                      <text x="55" y="-18" fontSize="8" fontWeight="bold" textAnchor="middle" fill="#15803D">SOIL HEALTH</text>
+                      <text x="55" y="-18" fontSize="8" fontWeight="bold" textAnchor="middle" fill="#15803D">{isBangla ? 'মাটির স্বাস্থ্য' : 'SOIL HEALTH'}</text>
                     </g>
                     {/* Pillar 3: Water Resilience (Right) */}
                     <g transform="translate(165, 75)">
                       <polygon points="20,45 35,37 35,10 20,18" fill="#0284C7" />
                       <polygon points="35,37 50,45 50,18 35,10" fill="#0369A1" />
                       <polygon points="20,18 35,10 50,18 35,26" fill="#38BDF8" />
-                      <text x="35" y="0" fontSize="8" fontWeight="bold" textAnchor="middle" fill="#0284C7">WATER RES</text>
+                      <text x="35" y="0" fontSize="8" fontWeight="bold" textAnchor="middle" fill="#0284C7">{isBangla ? 'পানি সাশ্রয়' : 'WATER RES'}</text>
                     </g>
                     {/* Floating Comparative Ribbon */}
                     <g transform="translate(140, 155)">
                       <rect x="-65" y="-10" width="130" height="20" rx="10" fill="#4338CA" />
-                      <text x="0" y="4" fontSize="9" fontWeight="bold" textAnchor="middle" fill="#FFFFFF">3 STRATEGY MATRIX</text>
+                      <text x="0" y="4" fontSize="9" fontWeight="bold" textAnchor="middle" fill="#FFFFFF">{isBangla ? '৩ কৌশলের তুলনা' : '3 STRATEGY MATRIX'}</text>
                     </g>
                   </svg>
                   <span style={{
@@ -821,7 +821,7 @@ export const HomePage = () => {
                     borderRadius: 'var(--radius-sm)',
                     boxShadow: '0 1px 4px rgba(0,0,0,0.1)'
                   }}>
-                    Laser Strata OCR
+                    {isBangla ? 'মাটি কার্ডের ওসিআর' : 'Soil Card OCR'}
                   </span>
                 </div>
 
@@ -856,7 +856,7 @@ export const HomePage = () => {
                     <g transform="translate(210, 48)">
                       <circle cx="0" cy="0" r="22" fill="#FFFFFF" stroke="#16A34A" strokeWidth="3" />
                       <text x="0" y="4" fontSize="11" fontWeight="bold" textAnchor="middle" fill="#15803D">92%</text>
-                      <text x="0" y="13" fontSize="7" fontWeight="bold" textAnchor="middle" fill="#16A34A">MATCH</text>
+                      <text x="0" y="13" fontSize="7" fontWeight="bold" textAnchor="middle" fill="#16A34A">{isBangla ? 'মিল' : 'MATCH'}</text>
                     </g>
                   </svg>
                   <span style={{
@@ -885,7 +885,7 @@ export const HomePage = () => {
                     borderRadius: 'var(--radius-sm)',
                     boxShadow: '0 1px 4px rgba(0,0,0,0.1)'
                   }}>
-                    Shield Defense
+                    {isBangla ? 'ফসল সুরক্ষা' : 'Crop Protection'}
                   </span>
                 </div>
 
@@ -919,7 +919,7 @@ export const HomePage = () => {
                     <path d="M 60,110 Q 100,75 140,105 T 220,80" fill="none" stroke="#F43F5E" strokeWidth="3" />
                     <g transform="translate(140, 150)">
                       <rect x="-65" y="-12" width="130" height="24" rx="12" fill="#E11D48" />
-                      <text x="0" y="4" fontSize="10" fontWeight="bold" textAnchor="middle" fill="#FFFFFF">+2.5 dS/m STRESS</text>
+                      <text x="0" y="4" fontSize="10" fontWeight="bold" textAnchor="middle" fill="#FFFFFF">{isBangla ? '+2.5 dS/m চাপ' : '+2.5 dS/m STRESS'}</text>
                     </g>
                   </svg>
                   <span style={{
@@ -989,7 +989,7 @@ export const HomePage = () => {
                     <path d="M 125,75 Q 145,55 165,65" fill="none" stroke="#D97706" strokeWidth="2.5" strokeDasharray="3 2" />
                     <g transform="translate(140, 150)">
                       <rect x="-55" y="-11" width="110" height="22" rx="11" fill="#78350F" />
-                      <text x="0" y="4" fontSize="10" fontWeight="bold" textAnchor="middle" fill="#FEF3C7">Δ +4.7 dS/m SHIFT</text>
+                      <text x="0" y="4" fontSize="10" fontWeight="bold" textAnchor="middle" fill="#FEF3C7">{isBangla ? 'Δ +4.7 dS/m পরিবর্তন' : 'Δ +4.7 dS/m SHIFT'}</text>
                     </g>
                   </svg>
                   <span style={{
