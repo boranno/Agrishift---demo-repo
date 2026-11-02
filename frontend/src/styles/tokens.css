@@ -39,6 +39,7 @@
 
   /* Text Colors */
   --color-text-main: #17251C; /* Main text */
+  --color-text-primary: var(--color-text-main);
   --color-text-secondary: #647067; /* Secondary text */
   --color-text-muted: #88968C;
   --color-text-inverse: #FFFFFF;
@@ -159,4 +160,3 @@
   --header-total-height: 93px;
   --max-content-width: 1280px;
 }
-
