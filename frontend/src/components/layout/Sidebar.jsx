@@ -28,6 +28,7 @@ export const Sidebar = () => {
       titleEn: 'Decision Support',
       titleBn: 'কৃষি সিদ্ধান্ত সহায়তা',
       items: [
+        { to: '/', label: t('nav.home'), icon: Home },
         { to: '/dashboard', label: t('nav.dashboard'), icon: LayoutDashboard },
         { to: '/farm-map', label: t('nav.farmMap'), icon: MapPin },
         { to: '/crop-suitability', label: t('nav.cropSuitability'), icon: Sprout },
@@ -65,7 +66,7 @@ export const Sidebar = () => {
       flexShrink: 0,
       backgroundColor: 'var(--color-sidebar-bg)',
       borderRight: '1px solid var(--color-sidebar-border)',
-      minHeight: 'calc(100vh - var(--header-height))',
+      minHeight: '100%',
       padding: '1.25rem 0.75rem',
       display: 'flex',
       flexDirection: 'column',
@@ -92,6 +93,7 @@ export const Sidebar = () => {
                 <NavLink
                   key={item.to}
                   to={item.to}
+                  end={item.to === '/'}
                   style={({ isActive }) => ({
                     display: 'flex',
                     alignItems: 'center',

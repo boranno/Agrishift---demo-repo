@@ -433,13 +433,38 @@ a:hover {
   transition: width 0.5s ease;
 }
 
-/* Layout Sticky Header Pinned Container */
+/* Layout Pinned Header Container (Fixed to viewport to prevent scroll desync) */
 .layout-sticky-header {
-  position: sticky;
+  position: fixed;
   top: 0;
-  z-index: 1000;
+  left: 0;
+  right: 0;
   width: 100%;
+  z-index: 1000;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: transform var(--transition-fast);
+}
+
+/* Spacer preserving document flow below fixed header */
+.layout-header-spacer {
+  height: var(--header-total-height, 93px);
+  width: 100%;
+  flex-shrink: 0;
+}
+
+/* Demonstration Notice Top Ribbon */
+.demo-notice-ribbon {
+  background-color: var(--color-primary-900);
+  color: #FFFFFF;
+  font-size: 11px;
+  min-height: var(--ribbon-height, 29px);
+  padding: 0.35rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-align: center;
+  box-sizing: border-box;
 }
 
 /* Glassmorphism Surface with Solid Opaque Protection */
@@ -449,15 +474,15 @@ a:hover {
   -webkit-backdrop-filter: blur(16px);
 }
 
-/* Responsive Navigation Bar Utilities */
-.desktop-nav-links {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
+/* Header Utility Controls & Interactive Hover States */
 .active-farm-nav-badge {
   display: inline-flex !important;
+  transition: all var(--transition-fast);
+}
+
+.active-farm-nav-badge:hover {
+  background-color: var(--color-primary-100) !important;
+  transform: translateY(-1px);
 }
 
 .mobile-menu-btn {
@@ -465,18 +490,18 @@ a:hover {
 }
 
 @media (max-width: 1024px) {
-  .desktop-nav-links {
-    display: none !important;
-  }
-  .active-farm-nav-badge {
-    display: none !important;
-  }
   .mobile-menu-btn {
     display: inline-flex !important;
   }
 }
 
-/* Sidebar Responsive Sticky Behavior */
+@media (max-width: 640px) {
+  .active-farm-nav-badge span {
+    max-width: 90px !important;
+  }
+}
+
+/* Sidebar Responsive Sticky & Scrollable Behavior */
 .sidebar-container {
   display: block;
   flex-shrink: 0;
@@ -485,8 +510,32 @@ a:hover {
 @media (min-width: 1025px) {
   .sidebar-container {
     position: sticky;
-    top: 96px;
+    top: var(--header-total-height, 93px);
     align-self: flex-start;
+    height: calc(100vh - var(--header-total-height, 93px));
+    max-height: calc(100vh - var(--header-total-height, 93px));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    /* Sleek scrollbar for sidebar */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.22) transparent;
+  }
+
+  .sidebar-container::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  .sidebar-container::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .sidebar-container::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.22);
+    border-radius: var(--radius-full);
+  }
+
+  .sidebar-container::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.4);
   }
 }
 
@@ -796,6 +845,48 @@ a:hover {
   animation: floatSubtleB 4.5s ease-in-out infinite;
 }
 
+/* NASA Globe Floating Telemetry Cards */
+.nasa-globe-card {
+  position: absolute;
+  padding: 0.75rem 0.9rem;
+  background-color: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 16px 32px -8px rgba(3, 30, 16, 0.35);
+  z-index: 10;
+  pointer-events: none;
+  transition: transform 250ms ease, opacity 250ms ease;
+}
+
+.nasa-globe-card-telemetry {
+  top: 8px;
+  right: -12px;
+  max-width: 220px;
+}
+
+.nasa-globe-card-target {
+  bottom: 12px;
+  left: -14px;
+  max-width: 225px;
+}
+
+@media (max-width: 640px) {
+  .nasa-globe-card-telemetry {
+    top: 4px;
+    right: 4px;
+    max-width: 175px;
+    padding: 0.55rem 0.7rem;
+  }
+  .nasa-globe-card-target {
+    bottom: 4px;
+    left: 4px;
+    max-width: 180px;
+    padding: 0.55rem 0.7rem;
+  }
+}
+
 /* Reduced Motion preferences */
 @media (prefers-reduced-motion: reduce) {
   .tall-portrait-card,
@@ -803,6 +894,7 @@ a:hover {
   .floating-3d-chip,
   .isometric-scene-container,
   .cinematic-panel,
+  .nasa-globe-card,
   .anim-float-a,
   .anim-float-b,
   .btn,

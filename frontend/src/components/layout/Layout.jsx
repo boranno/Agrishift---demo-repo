@@ -77,17 +77,7 @@ export const Layout = ({ children, isPublicLanding = false }) => {
       {/* Pinned Top Navigation Unit */}
       <div className="layout-sticky-header">
         {/* Top Demonstration Notice Ribbon */}
-        <div style={{
-          backgroundColor: 'var(--color-primary-900)',
-          color: '#FFFFFF',
-          fontSize: '11px',
-          padding: '0.35rem 1rem',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '0.5rem',
-          textAlign: 'center'
-        }}>
+        <div className="demo-notice-ribbon">
           <AlertCircle size={13} color="#FBBF24" />
           <span>
             {isBangla
@@ -98,6 +88,9 @@ export const Layout = ({ children, isPublicLanding = false }) => {
 
         <Navbar />
       </div>
+
+      {/* Spacer to preserve document flow under fixed header */}
+      <div className="layout-header-spacer" aria-hidden="true" />
 
       {/* Main Content Area */}
       {isPublicLanding ? (
