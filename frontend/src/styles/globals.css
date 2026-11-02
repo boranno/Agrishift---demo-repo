@@ -162,6 +162,7 @@ a:hover {
 /* Card components */
 .card {
   background-color: var(--color-bg-surface);
+  color: var(--color-text-main);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: var(--space-6);
@@ -689,6 +690,7 @@ a:hover {
 /* Tall Portrait Cards (Matching reference image proportions, rounded corners & deep 3D elevation) */
 .tall-portrait-card {
   background: #FFFFFF;
+  color: var(--color-text-main);
   border-radius: var(--radius-2xl);
   border: 1px solid rgba(255, 255, 255, 0.95);
   box-shadow: var(--shadow-3d-card);
@@ -1016,6 +1018,10 @@ a:hover {
   border-top: 1px solid rgba(255, 255, 255, 0.12);
 }
 
+.disclosure-card {
+  color: var(--color-text-main);
+}
+
 /* =========================================================
    DASHBOARD GREEN CONTROL CENTER WORKSPACE (MANDATORY)
    ========================================================= */
@@ -1128,5 +1134,3 @@ a:hover {
   border-color: var(--color-primary-500);
   box-shadow: 0 0 0 3px rgba(34, 160, 107, 0.25), var(--shadow-tactile-input);
 }
-
-

@@ -379,7 +379,7 @@ export const HomePage = () => {
                     <Droplets size={14} />
                   </div>
                   <div>
-                    <strong>NASA SMAP (L3 Radiometer):</strong> {isBangla ? 'মাটির উপরিভাগের আর্দ্রতা ও শুষ্কতা পরিমাপ (০–৫ সেমি)' : 'Surface soil moisture (0-5cm depth)'}
+                    <strong>{isBangla ? 'নাসা SMAP (L3 রেডিওমিটার):' : 'NASA SMAP (L3 Radiometer):'}</strong> {isBangla ? 'মাটির উপরিভাগের আর্দ্রতা পরিমাপ (০–৫ সেমি গভীরতা)' : 'Surface soil moisture (0–5 cm depth)'}
                   </div>
                 </div>
 
@@ -388,7 +388,7 @@ export const HomePage = () => {
                     <Sprout size={14} />
                   </div>
                   <div>
-                    <strong>MODIS / Landsat 8-9:</strong> {isBangla ? 'উদ্ভিদের সজীবতা (NDVI), পাতার ক্লোরোফিল ও পৃষ্ঠ তাপমাত্রা' : 'Vegetation health index, canopy chlorophyll'}
+                    <strong>{isBangla ? 'MODIS / Landsat ৮–৯:' : 'MODIS / Landsat 8–9:'}</strong> {isBangla ? 'উদ্ভিদের স্বাস্থ্য সূচক (NDVI), পাতার ক্লোরোফিল ও পৃষ্ঠের তাপমাত্রা' : 'Vegetation health index (NDVI), canopy chlorophyll, and surface temperature'}
                   </div>
                 </div>
 
@@ -397,7 +397,7 @@ export const HomePage = () => {
                     <CalendarDays size={14} />
                   </div>
                   <div>
-                    <strong>NASA GPM IMERG:</strong> {isBangla ? 'দৈনিক এবং মাসিক সঞ্চিত বৃষ্টিপাতের পূর্বাভাস ও ক্ষয়ক্ষতি সতর্কতা' : 'Precipitation frequency and early flood warnings'}
+                    <strong>{isBangla ? 'নাসা GPM IMERG:' : 'NASA GPM IMERG:'}</strong> {isBangla ? 'বৃষ্টিপাতের পরিমাণ ও ঘনত্ব এবং আগাম বন্যার সতর্কতা' : 'Precipitation frequency and early flood warnings'}
                   </div>
                 </div>
               </div>
@@ -1152,7 +1152,7 @@ export const HomePage = () => {
                   alignItems: 'center',
                   justifyContent: 'space-between'
                 }}>
-                  <span>০১</span>
+                  <span>{isBangla ? '০১' : '01'}</span>
                   <MapPin size={24} color="#16A34A" />
                 </div>
                 <h4 style={{ fontSize: 'var(--font-size-base)', marginBottom: '0.5rem', color: 'var(--color-primary-900)' }}>
@@ -1185,7 +1185,7 @@ export const HomePage = () => {
                   alignItems: 'center',
                   justifyContent: 'space-between'
                 }}>
-                  <span>০২</span>
+                  <span>{isBangla ? '০২' : '02'}</span>
                   <FileText size={24} color="#16A34A" />
                 </div>
                 <h4 style={{ fontSize: 'var(--font-size-base)', marginBottom: '0.5rem', color: 'var(--color-primary-900)' }}>
@@ -1218,7 +1218,7 @@ export const HomePage = () => {
                   alignItems: 'center',
                   justifyContent: 'space-between'
                 }}>
-                  <span>০৩</span>
+                  <span>{isBangla ? '০৩' : '03'}</span>
                   <CalendarDays size={24} color="#16A34A" />
                 </div>
                 <h4 style={{ fontSize: 'var(--font-size-base)', marginBottom: '0.5rem', color: 'var(--color-primary-900)' }}>
@@ -1251,7 +1251,7 @@ export const HomePage = () => {
                   alignItems: 'center',
                   justifyContent: 'space-between'
                 }}>
-                  <span>০৪</span>
+                  <span>{isBangla ? '০৪' : '04'}</span>
                   <Bell size={24} color="#16A34A" />
                 </div>
                 <h4 style={{ fontSize: 'var(--font-size-base)', marginBottom: '0.5rem', color: 'var(--color-primary-900)' }}>
@@ -1296,7 +1296,7 @@ export const HomePage = () => {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', fontSize: 'var(--font-size-sm)', lineHeight: 1.65 }}>
-            <div style={{
+            <div className="disclosure-card" style={{
               display: 'flex',
               alignItems: 'flex-start',
               gap: '0.85rem',
@@ -1310,7 +1310,7 @@ export const HomePage = () => {
               <span>{t('home.disclosure1')}</span>
             </div>
 
-            <div style={{
+            <div className="disclosure-card" style={{
               display: 'flex',
               alignItems: 'flex-start',
               gap: '0.85rem',
@@ -1324,7 +1324,7 @@ export const HomePage = () => {
               <span>{t('home.disclosure2')}</span>
             </div>
 
-            <div style={{
+            <div className="disclosure-card" style={{
               display: 'flex',
               alignItems: 'flex-start',
               gap: '0.85rem',
