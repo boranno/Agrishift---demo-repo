@@ -119,6 +119,7 @@ Creates an optimized production bundle in `dist/`.
 - **Optional Environment Variables (.env):**
   - `VITE_MAPTILER_KEY`: Optional MapTiler API key for custom vector styles or satellite tiles.
   - `VITE_MAPBOX_TOKEN`: Optional Mapbox token for Mapbox styles.
+  - `VITE_CARTO_API_KEY`: CARTO API key for the Voyager raster basemap. Restrict its allowed websites in CARTO; frontend keys are visible to users.
   - `VITE_TERRAIN_DEM_URL`: Optional RGB DEM terrain raster tile URL.
 
 In strict adherence to project scope rules:
@@ -126,4 +127,3 @@ In strict adherence to project scope rules:
 2. **Clear Demonstration Badges:** All mock/sample data is labeled with a purple `DEMO / SAMPLE DATA` badge.
 3. **No Decorative Inactive Controls:** Every implemented button, filter, tab, and form functions interactively or states its current status.
 4. **Backend Boundary:** Real API endpoints will be wired in Part 2.
-

@@ -6,7 +6,9 @@
 // Environment variable credentials (if configured by operator)
 export const MAPTILER_KEY = import.meta.env.VITE_MAPTILER_KEY || '';
 export const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || '';
+export const CARTO_API_KEY = import.meta.env.VITE_CARTO_API_KEY || '';
 export const TERRAIN_DEM_URL = import.meta.env.VITE_TERRAIN_DEM_URL || '';
+const cartoKeyParam = CARTO_API_KEY ? `?key=${encodeURIComponent(CARTO_API_KEY)}` : '';
 
 /**
  * Standard OpenStreetMap Raster Style (Free & Open Source)
@@ -68,19 +70,17 @@ export const SATELLITE_STYLE = {
 };
 
 /**
- * Topo / Clean Agricultural Style (CartoDB Positron)
+ * CARTO Voyager raster style
  * Attribution: OpenStreetMap contributors & CARTO
  */
 export const TOPO_STYLE = {
   version: 8,
-  name: 'Clean Topo / Cadastral',
+  name: 'CARTO Voyager',
   sources: {
     carto: {
       type: 'raster',
       tiles: [
-        'https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
-        'https://b.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
-        'https://c.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png'
+        `https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png${cartoKeyParam}`
       ],
       tileSize: 256,
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attributions" target="_blank" rel="noreferrer">CARTO</a>',
@@ -101,7 +101,7 @@ export const TOPO_STYLE = {
 export const MAP_LAYERS = [
   { id: 'osm', labelEn: 'Standard Map (OSM)', labelBn: 'সাধারণ মানচিত্র (ওএসএম)', style: OSM_STYLE, isSatellite: false },
   { id: 'satellite', labelEn: 'Satellite Imagery', labelBn: 'উপগ্রহ চিত্র', style: SATELLITE_STYLE, isSatellite: true },
-  { id: 'topo', labelEn: 'Clean Topo (CARTO)', labelBn: 'পরিচ্ছন্ন টোপোগ্রাফিক', style: TOPO_STYLE, isSatellite: false }
+  { id: 'topo', labelEn: 'CARTO Voyager', labelBn: 'CARTO ভয়েজার', style: TOPO_STYLE, isSatellite: false }
 ];
 
 export const WORLD_PRESET = {
@@ -127,6 +127,6 @@ export default {
   BANGLADESH_PRESET,
   MAPTILER_KEY,
   MAPBOX_TOKEN,
+  CARTO_API_KEY,
   TERRAIN_DEM_URL
 };
-
