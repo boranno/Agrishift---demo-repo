@@ -1,8 +1,8 @@
 # AgriShift Concept Considerations and Judge Review
 
 **Review date:** 2026-11-03  
-**Selected challenge:** [Field Shift: Adapting Farms with NASA Data](https://www.spaceappschallenge.org/2026/challenges/adapting-farms-with-nasa-data/)  
-**Local framing supplied by the team:** Khulna; salinity, storm surge, mangrove cover, and delta change  
+**Selected challenge statement:** [Field Shift: Adapting Farms with NASA Data](https://www.spaceappschallenge.org/2026/challenges/adapting-farms-with-nasa-data/)
+**Selected local event and regional problem:** [Khulna Local Event](https://www.spaceappschallenge.org/2026/local-events/khulna/) — gateway to the Sundarbans; mangrove cover, salinity, storm surge, and delta change.
 **Assessment scope:** Current repository and the team/event details shared in this conversation. This is a candid readiness review, not an official NASA score or a claim that the project page or event registration has been checked.
 
 ## 1. What the challenge asks
