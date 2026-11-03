@@ -10,7 +10,8 @@ import {
   Database,
   ShieldCheck,
   CheckCircle2,
-  XCircle
+  XCircle,
+  ExternalLink
 } from 'lucide-react';
 import { useTranslation } from '../../hooks/useTranslation';
 import { useFarm } from '../../context/FarmContext';
@@ -37,6 +38,61 @@ export const SalinityPredictionPage = () => {
           ? 'নাসার উপগ্রহ উপাত্ত ও এসআরডিআই মাটির তথ্যকে কাজে লাগিয়ে মাটির লবণাক্ততা (ইসি) পূর্বাভাসের এই ইন্টারফেসটি তৈরি করা হয়েছে। মডেলের প্রশিক্ষণ সম্পন্ন হলে এখানে স্বয়ংক্রিয় পূর্বাভাস প্রদর্শিত হবে।'
           : 'High-resolution topsoil electrical conductivity (ECe) prediction interface. Connects satellite surface moisture with regional hydrological variables.'}
       />
+
+      <section
+        className="card"
+        aria-labelledby="mit-salinity-projection-title"
+        style={{ marginBottom: '1.5rem' }}
+      >
+        <div className="card-header">
+          <h2 className="card-title" id="mit-salinity-projection-title">
+            <Layers size={18} color="var(--color-primary-800)" />
+            <span>{t('salinityPrediction.mitProjectionTitle')}</span>
+          </h2>
+          <span className="badge badge-neutral">
+            {t('salinityPrediction.externalResearchBadge')}
+          </span>
+        </div>
+
+        <p style={{ fontSize: 'var(--font-size-sm)', marginBottom: '1rem' }}>
+          {t('salinityPrediction.mitProjectionDescription')}
+        </p>
+
+        <div style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: '0.65rem',
+          marginBottom: '1rem'
+        }}>
+          <span className="badge badge-neutral">
+            {t('salinityPrediction.mitProjectionYears')}
+          </span>
+          <span className="badge badge-neutral">
+            {t('salinityPrediction.mitProjectionScenario')}
+          </span>
+          <span className="badge badge-neutral">
+            {t('salinityPrediction.mitProjectionUnit')}
+          </span>
+        </div>
+
+        <div className="callout callout-info" style={{ marginBottom: '1rem' }}>
+          <Info size={18} />
+          <span>{t('salinityPrediction.mitProjectionDisclaimer')}</span>
+        </div>
+
+        <a
+          className="btn btn-primary"
+          href="https://www.mit.edu/~eltahirgroup/DST_SoilSalinity/index.html"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <ExternalLink size={16} />
+          <span>{t('salinityPrediction.openMitExplorer')}</span>
+        </a>
+        <p style={{ fontSize: 'var(--font-size-xs)', marginTop: '0.75rem' }}>
+          {t('salinityPrediction.mitProjectionAttribution')}
+        </p>
+      </section>
 
       {/* Prominent Honest Model Unavailable Banner */}
       <ModelUnavailableBanner

@@ -368,6 +368,15 @@
     "inputStatusReady": "Schema & Validation Rules Configured",
     "expectedOutput": "Expected Model Output Specification",
     "unitContext": "Target Unit: Electrical Conductivity of Saturated Soil Paste Extract (ECe) in dS/m at 25°C.",
+    "mitProjectionTitle": "MIT Bangladesh Soil Salinity Projection Explorer",
+    "externalResearchBadge": "External research",
+    "mitProjectionDescription": "Explore MIT's interactive visualization of observed and modeled soil salinity across coastal Bangladesh, including future projections. The map and seasonal plots are hosted by MIT and open separately from AgriShift.",
+    "mitProjectionYears": "Projection years: 2025–2050",
+    "mitProjectionScenario": "Future scenario: SSP5-8.5",
+    "mitProjectionUnit": "Salinity: ECe (dS/m)",
+    "mitProjectionDisclaimer": "These are MIT research outputs, not AgriShift predictions or field measurements. The future projections use a high-emissions scenario; they provide regional context and should not be treated as a measurement or forecast for an individual farm.",
+    "openMitExplorer": "Open MIT interactive explorer",
+    "mitProjectionAttribution": "Source: MIT Eltahir Research Group. The explorer is not embedded because its host restricts framing; it opens in a new tab. Farm location selections in AgriShift are not transferred.",
     "targetArchitecture": "Planned Baseline Architecture: Spatio-temporal Gradient Boosted Regressor (XGBoost / LightGBM) with spatial leave-one-district-out validation.",
     "benchmarkTarget": "Target Accuracy Benchmark: MAE <= 1.2 dS/m across coastal upazilas."
   },
@@ -420,4 +429,3 @@
     "copyright": "AgriShift Project. Open-access agricultural research."
   }
 }
-
