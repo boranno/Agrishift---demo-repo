@@ -5,6 +5,34 @@
 
 export const INITIAL_ALERTS = [
   {
+    id: 'alert-surge-remal',
+    severity: 'critical',
+    category: 'surge',
+    titleEn: 'Cyclone Storm Surge Warning: High Breach Risk (LOSO LightGBM)',
+    titleBn: 'ঘূর্ণিঝড় জলোচ্ছ্বাস সতর্কতা: উপকূলীয় পোল্ডার উপচে পড়ার উচ্চ ঝুঁকি',
+    location: 'Shyamnagar & Dacope (Satkhira & Khulna Coastal Belt)',
+    date: '2026-10-28',
+    isRead: false,
+    messageEn: 'GTSM coastal water level anomaly + astronomical high tide projected to exceed coastal polder embankment elevation (1.8m) with >75% surge probability. Model verified against Cyclone Remal (ROC-AUC 0.955, Precision 93%).',
+    messageBn: 'জোয়ারের উচ্চতা ও ঝড়ো বাতাসের কারণে উপকূলীয় বাঁধ (১.৮মি) উপচে লবণাক্ত পানি প্রবেশের ঝুঁকি ৭৫% ছাড়িয়েছে। সাইক্লোন রিমাল যাচাইকৃত মডেলে এই সতর্কতা তৈরি হয়েছে।',
+    actionEn: 'Close polder sluice gates immediately; harvest mature T. Aman or shift harvested bundles to higher ground.',
+    actionBn: 'পোল্ডারের স্লুইস গেট অবিলম্বে বন্ধ করুন এবং পাকা আমন ধান কেটে দ্রুত উঁচু স্থানে সরিয়ে নিন।'
+  },
+  {
+    id: 'alert-root-waterlogging',
+    severity: 'warning',
+    category: 'waterlogging',
+    titleEn: 'Root-Zone Soil Saturation Alert: Hypoxia Stress Risk',
+    titleBn: 'শিকড় অঞ্চলের মাটির জলাবদ্ধতা সতর্কতা: অক্সিজেনের ঘাটতি ঝুঁকি',
+    location: 'Bhabadah Beel Basin (Jessore & Narail)',
+    date: '2026-10-26',
+    isRead: false,
+    messageEn: 'ERA5-Land soil moisture and Sentinel-1 SAR models indicate root-zone pore saturation exceeding 85% for the next 20 days. Verified LightGBM (ROC-AUC 0.972, Precision 85.4%).',
+    messageBn: 'মাটির নিচের স্তরে পানি জমে শিকড়ে অক্সিজেনের ঘাটতি হওয়ার ঝুঁকি দেখা দিয়েছে। ডাল ও সবজির শিকড় পচা রোধে সতর্কতা জরুরি।',
+    actionEn: 'Dig 30 cm deep drainage trenches between crop rows; avoid heavy fertilizer application until soil drains.',
+    actionBn: 'জমির আইল ও নালা কেটে দ্রুত পানি বের করার ব্যবস্থা করুন; মাটি না শুকানো পর্যন্ত সার প্রয়োগ স্থগিত রাখুন।'
+  },
+  {
     id: 'alert-1',
     severity: 'critical', // 'critical' | 'warning' | 'advisory'
     category: 'salinity',

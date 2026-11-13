@@ -16,6 +16,8 @@ The frontend reads the backend base URL through Vite environment variables:
 
 ## 2. API Endpoints Specification
 
+> **Implementation status:** The endpoints below are planned integration contracts, not live backend endpoints yet. The current soil-report page performs OCR in the browser and saves the reviewed profile in browser `localStorage`; it does not call either soil endpoint below.
+
 ### 2.1 Farm Geolocation & Profiles
 - **`GET /api/v1/farms/current`**
   - Response: Active farm metadata (district, upazila, union, aez, coordinates, area, soil texture, water source).
@@ -46,24 +48,20 @@ The frontend reads the backend base URL through Vite environment variables:
     ```json
     {
       "document_id": "ocr-doc-2026-001",
-      "lab_source": "SRDI Khulna Regional Lab",
-      "sample_date": "2026-09-15",
       "parameters": {
         "ph": 6.8,
-        "ec_ds_m": 4.8,
-        "organic_matter_pct": 1.65,
-        "nitrogen_pct": 0.12,
-        "phosphorus_ppm": 14.5,
-        "potassium_meq_100g": 0.28,
-        "sulfur_ppm": 18.2,
-        "zinc_ppm": 1.1,
-        "boron_ppm": 0.42
+        "ece_ds_m": 4.8,
+        "nitrogen_mg_kg": 120,
+        "phosphorus_mg_kg": 18,
+        "potassium_mg_kg": 150
       },
       "missing_fields": []
     }
     ```
 - **`POST /api/v1/soil/profile`**
   - Confirms and persists verified parameters to the active farm record.
+
+The current browser OCR extracts only soil pH, saturated-paste ECe (dS/m), and NPK (mg/kg; ppm is accepted by the parser). It does not collect other soil-card values. Generic EC, EC1:5, and ECw are not auto-interpreted as ECe. OCR loads PDF.js/Tesseract.js and language data from jsDelivr on demand, so file OCR requires an internet connection. The report itself is processed in the browser and is not sent to AgriShift or the CDN. Manual entry remains available without the OCR libraries. Reviewed values are saved only in the current browser's farm profile (`localStorage`) until a backend persistence endpoint is implemented. The video-demo button fills clearly marked illustrative values; those are not soil measurements.
 
 ---
 

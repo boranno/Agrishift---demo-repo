@@ -22,6 +22,7 @@ import { localizeFarmValue } from '../../utils/farmDisplay';
 import PageHeader from '../../components/common/PageHeader';
 import DemoBadge from '../../components/common/DemoBadge';
 import StatusBadge from '../../components/common/StatusBadge';
+import CropEvidencePanel from '../../components/crops/CropEvidencePanel';
 
 export const CropSuitabilityPage = () => {
   const { t, isBangla } = useTranslation();
@@ -76,15 +77,19 @@ export const CropSuitabilityPage = () => {
           </div>
         }
         helpText={isBangla
-          ? 'বারি ও ব্রি-র বৈজ্ঞানিক গবেষণার আলোকে আপনার খামারের বর্তমান মাটির লবণাক্ততা ও মৌসুমের ভিত্তিতে ফসলগুলোকে উপযুক্ত, প্রান্তিক এবং ঝুঁকিপূর্ণ শ্রেণীতে বিন্যাস করা হয়েছে।'
-          : 'Evaluates 25+ crops against published BARI/BRRI salinity tolerance thresholds. Never base sowing solely on one season; consider multi-season crop rotation sequences.'}
+          ? 'এটি একটি প্রদর্শনী নিয়মভিত্তিক স্ক্রিন, মাঠে যাচাইকৃত সুপারিশ নয়। ফসলভেদে গবেষণার প্রমাণের মান ভিন্ন; বপনের আগে স্থানীয় কৃষি কর্মকর্তার পরামর্শ নিন।'
+          : 'This is a demonstration rule-based screen, not a field-validated recommendation. Evidence quality varies by crop; consult local agricultural extension staff before sowing.'}
       />
 
       {/* Demo Rulebook Callout */}
       <div className="callout callout-demo">
         <Info size={18} />
-        <span>{t('cropSuitability.demoNotice')}</span>
+        <span>{isBangla
+          ? 'প্রদর্শনী স্কোর: প্রোটোটাইপের নিয়ম ব্যবহার করা হয়েছে; এগুলোকে যাচাইকৃত মাঠ-সুপারিশ হিসেবে ব্যবহার করবেন না।'
+          : 'Demo scores: prototype rules are used; do not treat these as validated field recommendations.'}</span>
       </div>
+
+      <CropEvidencePanel isBangla={isBangla} />
 
       {/* Farm Context & Season Switcher Banner */}
       <div className="card" style={{

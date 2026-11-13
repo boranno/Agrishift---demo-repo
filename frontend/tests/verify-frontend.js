@@ -1,6 +1,9 @@
+import assert from 'node:assert/strict';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { parseSoilReportText } from '../src/services/soilService.js';
+import { HOME_TOOL_GROUPS } from '../src/pages/Home/homeToolRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -90,4 +93,50 @@ if (!allPagesExist) {
 }
 
 console.log('✅ All 15 Feature components and localization checks passed!');
+
+const appSource = fs.readFileSync(path.resolve(__dirname, '../src/App.jsx'), 'utf-8');
+const appRoutePaths = [...appSource.matchAll(/<Route\s+path="([^"]+)"/g)]
+  .map(([, route]) => route)
+  .filter(route => route !== '/' && route !== '*')
+  .sort();
+const homeToolPaths = HOME_TOOL_GROUPS.flatMap(group => group.items.map(item => item.to)).sort();
+
+assert.equal(new Set(homeToolPaths).size, homeToolPaths.length, 'Home tool directory must not contain duplicate routes.');
+assert.deepEqual(homeToolPaths, appRoutePaths, 'Home tool directory must link to every app page route exactly once.');
+console.log(`✓ Home directory links to all ${homeToolPaths.length} feature routes.`);
+
+const parsedSoilReport = parseSoilReportText([
+  'pH (1:2.5): 7.2',
+  'ECe (dS/m): 4.5',
+  'Nitrogen (N): 120 mg/kg',
+  'Phosphorus (P): 18 mg/kg',
+  'Potassium (K): 150 mg/kg',
+  'Organic Matter (%): 1.65',
+  'Sulfur: 18.2 ppm',
+  'Zinc: 1.1 ppm',
+  'Boron: 0.42 ppm'
+].join('\n'));
+
+assert.deepEqual(parsedSoilReport, {
+  pH: 7.2,
+  ec: 4.5,
+  nitrogenMgKg: 120,
+  phosphorusMgKg: 18,
+  potassiumMgKg: 150
+});
+assert.deepEqual(parseSoilReportText('EC (dS/m): 4.5\nEC1:5: 1.2 dS/m\nNitrogen: 0.12%'), {});
+assert.deepEqual(parseSoilReportText([
+  'পিএইচ: ৬.৮',
+  'মাটির ECe (dS/m): ৪.৮',
+  'নাইট্রোজেন: ১২০ mg/kg',
+  'ফসফরাস: ১৮ mg/kg',
+  'পটাশিয়াম: ১৫০ mg/kg'
+].join('\n')), {
+  pH: 6.8,
+  ec: 4.8,
+  nitrogenMgKg: 120,
+  phosphorusMgKg: 18,
+  potassiumMgKg: 150
+});
+console.log('✓ Soil report parsing extracts only pH, saturated-paste ECe, and unit-labeled NPK.');
 

@@ -15,42 +15,60 @@ import {
 } from 'lucide-react';
 import { useTranslation } from '../../hooks/useTranslation';
 import { useFarm } from '../../context/FarmContext';
+import { KHULNA_DISTRICT_PROFILES, getActiveSeasonNasaProfile } from '../../services/nasaTelemetryService';
+import { localizeFarmValue } from '../../utils/farmDisplay';
 import PageHeader from '../../components/common/PageHeader';
 import DemoBadge from '../../components/common/DemoBadge';
 import StatusBadge from '../../components/common/StatusBadge';
 
 export const WhatIfSimulatorPage = () => {
   const { t, isBangla } = useTranslation();
-  const { farm, soil } = useFarm();
+  const { farm, soil, season } = useFarm();
+
+  const [activeDistrict, setActiveDistrict] = useState(
+    KHULNA_DISTRICT_PROFILES[farm?.district] ? farm.district : 'Khulna'
+  );
 
   // Scenario input controls
   const [rainfallDelta, setRainfallDelta] = useState(-20); // -40% to +40%
-  const [simSalinity, setSimSalinity] = useState(6.5); // 1.0 to 16.0 dS/m
+  const [simSalinity, setSimSalinity] = useState(soil?.ec || 5.4); // 1.0 to 16.0 dS/m
   const [irrigationWaterQuality, setIrrigationWaterQuality] = useState('canal_brackish');
   const [tempDelta, setTempDelta] = useState(1.5); // -2°C to +4°C
   const [selectedCrop, setSelectedCrop] = useState('crop-sunflower');
 
-  // Compute heuristic risk response
+  const distProfile = KHULNA_DISTRICT_PROFILES[activeDistrict] || KHULNA_DISTRICT_PROFILES.Khulna;
+  const currentProfile = getActiveSeasonNasaProfile(activeDistrict, season || 'rabi');
+
+  // Compute heuristic risk response informed by district baseline & LightGBM drought threshold
   const computeSimulation = () => {
     let riskScore = 0; // 0 to 100
 
-    // Salinity impact
-    if (simSalinity > 8.0) riskScore += 45;
-    else if (simSalinity > 5.0) riskScore += 25;
-    else if (simSalinity > 3.0) riskScore += 10;
+    // Salinity impact scaled by district coastal proximity
+    const effectiveEc = simSalinity;
+    if (effectiveEc > 8.0) riskScore += 45;
+    else if (effectiveEc > 5.0) riskScore += 25;
+    else if (effectiveEc > 3.0) riskScore += 10;
 
     // Rainfall drought impact
     if (rainfallDelta < -25) riskScore += 30;
     else if (rainfallDelta < 0) riskScore += 15;
 
-    // Irrigation quality
-    if (irrigationWaterQuality === 'canal_brackish') riskScore += 20;
-    else if (irrigationWaterQuality === 'rainfed_only') riskScore += 25;
+    // Heat stress impact (MODIS LST > 35°C threshold)
+    if (tempDelta > 2.0) riskScore += 15;
+    else if (tempDelta > 0.5) riskScore += 8;
 
-    // Crop modifier
-    if (selectedCrop === 'crop-sunflower') riskScore -= 20; // resilient
+    // Irrigation quality
+    if (irrigationWaterQuality === 'canal_brackish') {
+      riskScore += distProfile.zone.startsWith('coastal') ? 25 : 12;
+    } else if (irrigationWaterQuality === 'rainfed_only') {
+      riskScore += 22;
+    }
+
+    // Crop modifier based on salinity & rooting physics
+    if (selectedCrop === 'crop-sunflower') riskScore -= 20; // resilient deep taproot
     if (selectedCrop === 'crop-brri67') riskScore -= 15; // salt tolerant boro
     if (selectedCrop === 'crop-potato') riskScore += 35; // very sensitive
+    if (selectedCrop === 'crop-mungbean') riskScore += rainfallDelta > 20 ? 15 : -5;
 
     const finalScore = Math.max(10, Math.min(95, riskScore));
 
@@ -58,11 +76,16 @@ export const WhatIfSimulatorPage = () => {
     if (finalScore > 65) riskLevel = 'critical';
     else if (finalScore > 40) riskLevel = 'moderate';
 
+    // Projected 1-Month Ahead VCI impact
+    const vciImpact = Math.round(distProfile.vciBase + (rainfallDelta * 0.3) - (effectiveEc * 2.2) - (tempDelta * 2.5));
+    const projectedVci = Math.max(12, Math.min(95, vciImpact));
+
     return {
       score: finalScore,
       level: riskLevel,
-      waterStressPct: Math.min(100, Math.max(15, 50 - rainfallDelta * 0.9)),
-      osmoticShockPct: Math.min(100, Math.round(simSalinity * 6.2))
+      projectedVci,
+      waterStressPct: Math.min(100, Math.max(15, Math.round(50 - rainfallDelta * 0.9 + tempDelta * 4))),
+      osmoticShockPct: Math.min(100, Math.round(effectiveEc * 6.2))
     };
   };
 
@@ -107,6 +130,36 @@ export const WhatIfSimulatorPage = () => {
               <SlidersHorizontal size={20} color="var(--color-primary-800)" />
               <span>{t('simulator.controlsTitle')}</span>
             </h2>
+          </div>
+
+          {/* District Preset Switcher */}
+          <div className="form-group" style={{ backgroundColor: 'var(--color-bg-cream)', padding: '0.65rem 0.85rem', borderRadius: 'var(--radius-md)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+              <label className="form-label" htmlFor="sim-dist" style={{ marginBottom: 0, fontWeight: 'bold' }}>
+                {isBangla ? 'খুলনা বিভাগ জেলা বেঞ্চমার্ক:' : 'Khulna District Telemetry Preset:'}
+              </label>
+              <span className="badge badge-suitable" style={{ fontSize: '10px' }}>
+                {isBangla ? distProfile.zoneLabelBn : distProfile.zoneLabelEn}
+              </span>
+            </div>
+            <select
+              id="sim-dist"
+              value={activeDistrict}
+              onChange={e => {
+                const newDist = e.target.value;
+                setActiveDistrict(newDist);
+                const prof = KHULNA_DISTRICT_PROFILES[newDist];
+                if (prof) setSimSalinity(prof.baseSalinityEc);
+              }}
+              className="form-select"
+              style={{ fontSize: '12px', fontWeight: '600' }}
+            >
+              {Object.keys(KHULNA_DISTRICT_PROFILES).map(d => (
+                <option key={d} value={d}>
+                  {localizeFarmValue(d, isBangla)} (Base EC {KHULNA_DISTRICT_PROFILES[d].baseSalinityEc} dS/m | VCI {KHULNA_DISTRICT_PROFILES[d].vciBase})
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Target Crop Selector */}
@@ -258,10 +311,42 @@ export const WhatIfSimulatorPage = () => {
               }} />
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: 'var(--color-text-secondary)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: 'var(--color-text-secondary)', marginBottom: '0.75rem' }}>
               <span>{isBangla ? 'অনুকূল বৃদ্ধি' : 'Safe Window'}</span>
               <span>{simulation.score}/100 {isBangla ? 'চাপ সূচক' : 'Stress Index'}</span>
               <span>{isBangla ? 'চরম ঝুঁকি' : 'Critical Failure'}</span>
+            </div>
+
+            {/* 1-Month Ahead LightGBM Projected VCI Box */}
+            <div style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: 'var(--radius-sm)',
+              padding: '0.6rem 0.75rem',
+              border: '1px solid var(--color-border)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}>
+              <div style={{ fontSize: '11px', color: 'var(--color-text-secondary)' }}>
+                <strong>{isBangla ? '১-মাস অগ্রিম পূর্বাভাষিত ক্যানোপি VCI:' : '1-Month Ahead LightGBM Projected VCI:'}</strong>
+                <div style={{ fontSize: '10px', color: 'var(--color-text-muted)' }}>
+                  {isBangla ? `জেলা বেসলাইন: ${distProfile.vciBase}/১০০` : `District baseline: ${distProfile.vciBase}/100`}
+                </div>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <span style={{
+                  fontSize: '1.25rem',
+                  fontWeight: 'bold',
+                  color: simulation.projectedVci < 35 ? '#DC2626' : simulation.projectedVci < 45 ? '#D97706' : '#16A34A'
+                }}>
+                  {simulation.projectedVci} / 100
+                </span>
+                <div style={{ fontSize: '10px', fontWeight: '600', color: simulation.projectedVci < 35 ? '#DC2626' : '#16A34A' }}>
+                  {simulation.projectedVci < 35
+                    ? (isBangla ? '⚠️ খরা সীমা (<৩৫)' : '⚠️ Drought Stress (<35)')
+                    : (isBangla ? '✓ নিরাপদ ক্যানোপি' : '✓ Safe Biomass')}
+                </div>
+              </div>
             </div>
           </div>
 

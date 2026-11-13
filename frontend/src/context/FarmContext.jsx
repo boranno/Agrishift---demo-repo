@@ -31,15 +31,9 @@ export const DEMO_FARM = {
 export const DEMO_SOIL = {
   pH: 6.8,
   ec: 4.8, // dS/m (moderate salinity)
-  organicMatter: 1.65, // %
-  nitrogen: 0.12, // %
-  phosphorus: 14.5, // ppm
-  potassium: 0.28, // meq/100g
-  sulfur: 18.2, // ppm
-  zinc: 1.1, // ppm
-  boron: 0.42, // ppm
-  testedDate: '2026-09-15',
-  source: 'SRDI Khulna Regional Lab — Card #SRDI-KH-4029',
+  nitrogenMgKg: 120,
+  phosphorusMgKg: 18,
+  potassiumMgKg: 150,
   isDemo: true
 };
 
@@ -73,11 +67,9 @@ export const FarmProvider = ({ children }) => {
   };
 
   const updateSoil = (newSoilData) => {
-    const updated = { ...soil, ...newSoilData, isDemo: false };
+    const updated = { ...soil, ...newSoilData, isDemo: newSoilData.isDemo ?? false };
+    localStorage.setItem(STORAGE_SOIL_KEY, JSON.stringify(updated));
     setSoil(updated);
-    try {
-      localStorage.setItem(STORAGE_SOIL_KEY, JSON.stringify(updated));
-    } catch (e) {}
   };
 
   const resetToDemoFarm = () => {

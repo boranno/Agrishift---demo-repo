@@ -25,8 +25,17 @@ export const SalinityPredictionPage = () => {
   const { t, isBangla } = useTranslation();
   const { farm, soil, season, setSeason } = useFarm();
   const [selectedDate, setSelectedDate] = useState('2026-10-27');
+  const [salinityDataset, setSalinityDataset] = useState('model');
+  const [salinityYear, setSalinityYear] = useState(2025);
+  const [failedSalinityMapUrl, setFailedSalinityMapUrl] = useState(null);
 
   const spec = getSalinityPredictionSpec();
+  const salinityYears = salinityDataset === 'model'
+    ? [2025, 2030, 2035, 2040, 2045, 2050]
+    : [2000, 2009, 2023];
+  const salinityMapUrl = salinityDataset === 'model'
+    ? `https://www.mit.edu/~eltahirgroup/DST_SoilSalinity/data/soil_salinity_${salinityYear}.png`
+    : `https://www.mit.edu/~eltahirgroup/DST_SoilSalinity/data/observed_soil_salinity_${salinityYear}.png`;
 
   return (
     <div>
@@ -50,13 +59,46 @@ export const SalinityPredictionPage = () => {
             <span>{t('salinityPrediction.mitProjectionTitle')}</span>
           </h2>
           <span className="badge badge-neutral">
-            {t('salinityPrediction.externalResearchBadge')}
+            {t(salinityDataset === 'model'
+              ? 'salinityPrediction.modeledResearchBadge'
+              : 'salinityPrediction.observedResearchBadge')}
           </span>
         </div>
 
         <p style={{ fontSize: 'var(--font-size-sm)', marginBottom: '1rem' }}>
           {t('salinityPrediction.mitProjectionDescription')}
         </p>
+
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginBottom: '1rem' }}>
+          <label style={{ display: 'grid', gap: '0.35rem', fontSize: 'var(--font-size-xs)' }}>
+            <span>{t('salinityPrediction.mapDatasetLabel')}</span>
+            <select
+              className="form-select"
+              value={salinityDataset}
+              onChange={event => {
+                const nextDataset = event.target.value;
+                setSalinityDataset(nextDataset);
+                setSalinityYear(nextDataset === 'model' ? 2025 : 2023);
+              }}
+            >
+              <option value="model">{t('salinityPrediction.modeledDataset')}</option>
+              <option value="observed">{t('salinityPrediction.observedDataset')}</option>
+            </select>
+          </label>
+
+          <label style={{ display: 'grid', gap: '0.35rem', fontSize: 'var(--font-size-xs)' }}>
+            <span>{t('salinityPrediction.mapYearLabel')}</span>
+            <select
+              className="form-select"
+              value={salinityYear}
+              onChange={event => setSalinityYear(Number(event.target.value))}
+            >
+              {salinityYears.map(year => (
+                <option key={year} value={year}>{year}</option>
+              ))}
+            </select>
+          </label>
+        </div>
 
         <div style={{
           display: 'flex',
@@ -65,30 +107,91 @@ export const SalinityPredictionPage = () => {
           marginBottom: '1rem'
         }}>
           <span className="badge badge-neutral">
-            {t('salinityPrediction.mitProjectionYears')}
+            {t(salinityDataset === 'model'
+              ? 'salinityPrediction.mitProjectionYears'
+              : 'salinityPrediction.mitObservedYears')}
           </span>
-          <span className="badge badge-neutral">
-            {t('salinityPrediction.mitProjectionScenario')}
-          </span>
+          {salinityDataset === 'model' && (
+            <span className="badge badge-neutral">
+              {t('salinityPrediction.mitProjectionScenario')}
+            </span>
+          )}
           <span className="badge badge-neutral">
             {t('salinityPrediction.mitProjectionUnit')}
           </span>
         </div>
 
-        <div className="callout callout-info" style={{ marginBottom: '1rem' }}>
-          <Info size={18} />
-          <span>{t('salinityPrediction.mitProjectionDisclaimer')}</span>
+        <div style={{
+          backgroundColor: '#F3F4F6',
+          border: '1px solid var(--color-border)',
+          borderRadius: 'var(--radius-md)',
+          overflow: 'hidden',
+          marginBottom: '0.75rem'
+        }}>
+          {failedSalinityMapUrl === salinityMapUrl ? (
+            <div style={{ padding: '2rem', textAlign: 'center' }}>
+              <p>{t('salinityPrediction.mapUnavailable')}</p>
+              <a href={salinityMapUrl} target="_blank" rel="noopener noreferrer">
+                {t('salinityPrediction.openSelectedMap')}
+              </a>
+            </div>
+          ) : (
+            <img
+              key={salinityMapUrl}
+              src={salinityMapUrl}
+              alt={`${t(salinityDataset === 'model'
+                ? 'salinityPrediction.modeledMapAlt'
+                : 'salinityPrediction.observedMapAlt')} ${salinityYear}`}
+              onError={() => setFailedSalinityMapUrl(salinityMapUrl)}
+              style={{ display: 'block', width: '100%', maxHeight: '480px', objectFit: 'contain' }}
+            />
+          )}
         </div>
 
-        <a
-          className="btn btn-primary"
-          href="https://www.mit.edu/~eltahirgroup/DST_SoilSalinity/index.html"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <ExternalLink size={16} />
-          <span>{t('salinityPrediction.openMitExplorer')}</span>
-        </a>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1rem' }}>
+          <span style={{
+            width: 'min(240px, 55vw)',
+            height: '12px',
+            borderRadius: 'var(--radius-full)',
+            background: 'linear-gradient(90deg, #08306b, #2171b5, #41ab5d, #fdd835, #fb8c00, #c62828)'
+          }} aria-hidden="true" />
+          <span style={{ fontSize: 'var(--font-size-xs)' }}>
+            {t('salinityPrediction.mapLegend')}
+          </span>
+        </div>
+
+        <p style={{ fontSize: 'var(--font-size-xs)', marginBottom: '1rem' }}>
+          {t('salinityPrediction.mapLocationContext')}{' '}
+          <strong>{localizeFarmValue(farm?.upazila || 'Dacope', isBangla)}, {localizeFarmValue(farm?.district || 'Khulna', isBangla)}</strong>
+        </p>
+
+        <div className="callout callout-info" style={{ marginBottom: '1rem' }}>
+          <Info size={18} />
+          <span>{t(salinityDataset === 'model'
+            ? 'salinityPrediction.mitProjectionDisclaimer'
+            : 'salinityPrediction.mitObservedDisclaimer')}</span>
+        </div>
+
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
+          <a
+            className="btn btn-primary"
+            href="https://www.mit.edu/~eltahirgroup/DST_SoilSalinity/index.html"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <ExternalLink size={16} />
+            <span>{t('salinityPrediction.openMitExplorer')}</span>
+          </a>
+          <a
+            className="btn btn-secondary"
+            href={salinityMapUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <ExternalLink size={16} />
+            <span>{t('salinityPrediction.openSelectedMap')}</span>
+          </a>
+        </div>
         <p style={{ fontSize: 'var(--font-size-xs)', marginTop: '0.75rem' }}>
           {t('salinityPrediction.mitProjectionAttribution')}
         </p>

@@ -27,17 +27,26 @@ import {
 import { useTranslation } from '../../hooks/useTranslation';
 import { useFarm } from '../../context/FarmContext';
 import { ROTATION_PATTERNS, COMPARISON_PLANS } from '../../services/rotationService';
+import { KHULNA_DISTRICT_PROFILES, getActiveSeasonNasaProfile } from '../../services/nasaTelemetryService';
+import { localizeFarmValue } from '../../utils/farmDisplay';
 import PageHeader from '../../components/common/PageHeader';
 import DemoBadge from '../../components/common/DemoBadge';
 
 export const RotationPlannerPage = () => {
   const { t, isBangla } = useTranslation();
-  const { farm, soil } = useFarm();
+  const { farm, soil, season } = useFarm();
 
+  const [selectedDistrict, setSelectedDistrict] = useState(
+    KHULNA_DISTRICT_PROFILES[farm?.district] ? farm.district : 'Khulna'
+  );
   const [selectedPriority, setSelectedPriority] = useState('soil');
   const [selectedWater, setSelectedWater] = useState('scarce');
   const [viewMode, setViewMode] = useState('timeline'); // 'timeline' or 'comparison'
   const [adoptedPlan, setAdoptedPlan] = useState(null);
+
+  const districtProfile = KHULNA_DISTRICT_PROFILES[selectedDistrict] || KHULNA_DISTRICT_PROFILES.Khulna;
+  const currentNasa = getActiveSeasonNasaProfile(selectedDistrict, season || 'rabi');
+  const droughtHazard = currentNasa.hazards.find(h => h.id === 'drought_vci');
 
   // Filter or prioritize rotation patterns
   const matchingPatterns = ROTATION_PATTERNS.filter(p =>
@@ -135,13 +144,60 @@ export const RotationPlannerPage = () => {
           </div>
         </div>
 
-        <div style={{ fontSize: '11px', color: 'var(--color-text-secondary)', lineHeight: 1.5 }}>
+        <div style={{ fontSize: '11px', color: 'var(--color-text-secondary)', lineHeight: 1.5, marginBottom: '0.75rem' }}>
           <strong style={{ color: 'var(--color-primary-800)' }}>
             {isBangla ? 'রূপান্তরের প্রয়োজনীয়তা: ' : 'Why Transition: '}
           </strong>
           {isBangla
             ? 'বর্তমান ধারায় শুষ্ক মৌসুমে জমি অনাবাদি থাকা বা নোনা ভূগর্ভস্থ পানি দিয়ে অতিরিক্ত বোরো চাষ মাটির ওপর লবণের আস্তরণ তৈরি করে। নিচের জলবায়ু-সহনশীল ৩-মৌসুমী বিকল্পগুলো মাটির লবণাক্ততা দমন ও পানির চাহিদা ৮০% পর্যন্ত হ্রাস করতে সক্ষম।'
             : 'Traditional coastal monoculture leaves soils exposed to high solar evaporation from February to May, causing rapid salt accumulation. Transitioning to the climate-resilient sequences below restores soil organic matter and cuts supplemental water demand by up to 80%.'}
+        </div>
+
+        {/* Dynamic 1-Month Ahead Hazard Early Warning Integration */}
+        <div style={{
+          backgroundColor: '#F0FDF4',
+          border: '1px solid #BBF7D0',
+          borderRadius: 'var(--radius-md)',
+          padding: '0.65rem 0.85rem',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '0.5rem',
+          fontSize: '11px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <span style={{ fontWeight: 'bold', color: 'var(--color-primary-900)' }}>
+              {isBangla ? 'পর্যবেক্ষণ জেলা:' : 'Telemetry Zone:'}
+            </span>
+            <select
+              value={selectedDistrict}
+              onChange={e => setSelectedDistrict(e.target.value)}
+              style={{
+                fontSize: '11px',
+                fontWeight: 'bold',
+                padding: '2px 6px',
+                borderRadius: '4px',
+                border: '1px solid #86EFAC',
+                backgroundColor: '#FFFFFF',
+                color: 'var(--color-primary-900)'
+              }}
+            >
+              {Object.keys(KHULNA_DISTRICT_PROFILES).map(d => (
+                <option key={d} value={d}>
+                  {localizeFarmValue(d, isBangla)}
+                </option>
+              ))}
+            </select>
+            <span style={{ color: 'var(--color-text-secondary)' }}>
+              • {isBangla ? `১-মাস অগ্রিম খরা পূর্বাভাস: ${droughtHazard?.probability || 34}% ঝুঁকি` : `1-Month Ahead Drought Forecast: ${droughtHazard?.probability || 34}% risk`}
+            </span>
+          </div>
+          <span className="badge badge-suitable" style={{ fontSize: '10px' }}>
+            {droughtHazard?.probability >= 24
+              ? (isBangla ? 'সূর্যমুখী বা সরিষা সুপারিশকৃত' : 'Sunflower / Mustard Recommended')
+              : (isBangla ? 'স্বাভাবিক সেচ বিন্যাস প্রযোজ্য' : 'Standard Rotation Feasible')}
+          </span>
         </div>
       </div>
 

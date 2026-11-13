@@ -1,25 +1,38 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   UploadCloud,
   FileText,
   CheckCircle2,
   AlertTriangle,
-  RotateCcw,
   Save,
-  Eye,
   Info,
-  Clock,
   Sparkles
 } from 'lucide-react';
 import { useTranslation } from '../../hooks/useTranslation';
 import { useFarm } from '../../context/FarmContext';
 import {
   validateSoilCardFile,
-  simulateOcrExtraction,
-  SAMPLE_SRDI_CARDS
+  extractSoilReport,
+  SAMPLE_SOIL_CARD
 } from '../../services/soilService';
 import PageHeader from '../../components/common/PageHeader';
 import DemoBadge from '../../components/common/DemoBadge';
+
+const SOIL_PARAMETER_FIELDS = [
+  'pH',
+  'ec',
+  'nitrogenMgKg',
+  'phosphorusMgKg',
+  'potassiumMgKg'
+];
+
+const toFormValues = (values = {}) => Object.fromEntries(
+  SOIL_PARAMETER_FIELDS.map(field => [
+    field,
+    values[field] === null || values[field] === undefined ? '' : String(values[field])
+  ])
+);
 
 export const SoilReportPage = () => {
   const { t, isBangla } = useTranslation();
@@ -28,24 +41,16 @@ export const SoilReportPage = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [filePreview, setFilePreview] = useState(null);
   const [fileError, setFileError] = useState('');
+  const [ocrFailureDetail, setOcrFailureDetail] = useState('');
+  const [formError, setFormError] = useState('');
 
   // Processing state
   const [isProcessing, setIsProcessing] = useState(false);
   const [ocrProgress, setOcrProgress] = useState({ progress: 0, stageEn: '', stageBn: '' });
   const [extractionResult, setExtractionResult] = useState(null);
+  const [isDemoValues, setIsDemoValues] = useState(soil?.isDemo === true);
 
-  // Editable Form fields
-  const [formFields, setFormFields] = useState({
-    pH: soil?.pH || 6.8,
-    ec: soil?.ec || 4.8,
-    organicMatter: soil?.organicMatter || 1.65,
-    nitrogen: soil?.nitrogen || 0.12,
-    phosphorus: soil?.phosphorus || 14.5,
-    potassium: soil?.potassium || 0.28,
-    sulfur: soil?.sulfur || 18.2,
-    zinc: soil?.zinc || 1.1,
-    boron: soil?.boron || 0.42
-  });
+  const [formFields, setFormFields] = useState(() => toFormValues(soil));
 
   const [missingWarning, setMissingWarning] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
@@ -57,25 +62,32 @@ export const SoilReportPage = () => {
     if (files && files[0]) {
       processSelectedFile(files[0]);
     }
+    if (e.currentTarget?.tagName === 'INPUT') e.currentTarget.value = '';
   };
 
   const processSelectedFile = (file) => {
     const val = validateSoilCardFile(file);
     if (!val.valid) {
-      setFileError(val.error);
+      setFileError(t(`soilOCR.${val.error}`));
       return;
     }
 
+    setFileError('');
+    setOcrFailureDetail('');
     setSelectedFile(file);
+    setIsDemoValues(false);
+    setFormFields(toFormValues());
+    setMissingWarning(false);
     if (file.type.startsWith('image/')) {
       const reader = new FileReader();
       reader.onload = (e) => setFilePreview(e.target.result);
+      reader.onerror = () => setFileError(t('soilOCR.previewFailed'));
       reader.readAsDataURL(file);
     } else {
       setFilePreview(null);
     }
 
-    // Trigger simulated OCR
+    setOcrProgress({ progress: 0, stageEn: '', stageBn: '' });
     startOcrExtraction(file);
   };
 
@@ -83,27 +95,35 @@ export const SoilReportPage = () => {
     setIsProcessing(true);
     setExtractionResult(null);
     setSavedSuccess(false);
+    setFormError('');
+    if (extractionResult?.isMock !== true) setIsDemoValues(false);
 
     try {
-      const res = await simulateOcrExtraction(fileOrId, (p) => setOcrProgress(p));
-      setExtractionResult(res.data);
-      setFormFields({
-        ...formFields,
-        ...res.data.extractedValues
-      });
-      setMissingWarning(res.data.missingFields.length > 0);
+      const result = await extractSoilReport(fileOrId, setOcrProgress);
+      setExtractionResult(result);
+      setIsDemoValues(result.isMock === true);
+      setFormFields(toFormValues(result.extractedValues));
+      setMissingWarning(result.missingFields.length > 0);
     } catch (err) {
-      setFileError('OCR processing failed. Please try again.');
+      setFileError(t('soilOCR.ocrFailed'));
+      setOcrFailureDetail(err instanceof Error ? err.message : String(err));
     } finally {
       setIsProcessing(false);
     }
   };
 
   const handleLoadSample = (sampleId) => {
+    if (sampleId !== SAMPLE_SOIL_CARD.id) return;
+    const sample = SAMPLE_SOIL_CARD;
     setFileError('');
-    setSelectedFile({ name: 'SRDI_Khulna_Dacope_SoilCard_2026.png', size: 1024 * 780, type: 'image/png' });
+    setOcrFailureDetail('');
+    setSelectedFile({ name: sample.cardName, size: 0, type: 'application/x-demo' });
     setFilePreview(null);
-    startOcrExtraction(sampleId);
+    setExtractionResult(sample);
+    setIsDemoValues(true);
+    setFormFields(toFormValues(sample.extractedValues));
+    setMissingWarning(sample.missingFields.length > 0);
+    setSavedSuccess(false);
   };
 
   const handleInputChange = (field, val) => {
@@ -112,23 +132,47 @@ export const SoilReportPage = () => {
       [field]: val
     }));
     setSavedSuccess(false);
+    setFormError('');
   };
 
   const handleSaveToProfile = (e) => {
     e.preventDefault();
-    updateSoil({
-      pH: parseFloat(formFields.pH),
-      ec: parseFloat(formFields.ec),
-      organicMatter: parseFloat(formFields.organicMatter),
-      nitrogen: parseFloat(formFields.nitrogen),
-      phosphorus: parseFloat(formFields.phosphorus),
-      potassium: parseFloat(formFields.potassium),
-      sulfur: parseFloat(formFields.sulfur),
-      zinc: formFields.zinc !== '' ? parseFloat(formFields.zinc) : null,
-      boron: formFields.boron !== '' ? parseFloat(formFields.boron) : null,
-      testedDate: new Date().toISOString().split('T')[0],
-      source: extractionResult?.cardName || 'SRDI Soil Health Card (Digitized via OCR)'
-    });
+    const pH = Number(formFields.pH);
+    const ec = Number(formFields.ec);
+    const optionalNutrients = SOIL_PARAMETER_FIELDS
+      .filter(field => !['pH', 'ec'].includes(field))
+      .map(field => formFields[field] === '' ? null : Number(formFields[field]));
+
+    if (
+      formFields.pH === '' || !Number.isFinite(pH) || pH < 3 || pH > 10 ||
+      formFields.ec === '' || !Number.isFinite(ec) || ec < 0 || ec > 30 ||
+      optionalNutrients.some(value => value !== null && (!Number.isFinite(value) || value < 0 || value > 100000))
+    ) {
+      setFormError(t('soilOCR.validationError'));
+      return;
+    }
+
+    const numberOrNull = value => value === '' ? null : Number(value);
+    try {
+      updateSoil({
+        pH,
+        ec,
+        nitrogenMgKg: numberOrNull(formFields.nitrogenMgKg),
+        phosphorusMgKg: numberOrNull(formFields.phosphorusMgKg),
+        potassiumMgKg: numberOrNull(formFields.potassiumMgKg),
+        organicMatter: null,
+        nitrogen: null,
+        phosphorus: null,
+        potassium: null,
+        sulfur: null,
+        zinc: null,
+        boron: null,
+        isDemo: isDemoValues
+      });
+    } catch {
+      setFormError(t('soilOCR.saveFailed'));
+      return;
+    }
 
     setSavedSuccess(true);
     setTimeout(() => setSavedSuccess(false), 4000);
@@ -144,44 +188,46 @@ export const SoilReportPage = () => {
           <div style={{ display: 'flex', gap: '0.4rem' }}>
             <button
               type="button"
-              onClick={() => handleLoadSample('srdi-khulna-sample')}
+              onClick={() => handleLoadSample(SAMPLE_SOIL_CARD.id)}
               className="btn btn-secondary btn-sm"
             >
               <FileText size={14} />
-              <span>{isBangla ? 'নমুনা এসআরডিআই কার্ড (খুলনা)' : 'Sample SRDI Card (Khulna)'}</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => handleLoadSample('srdi-satkhira-sample')}
-              className="btn btn-secondary btn-sm"
-            >
-              <FileText size={14} />
-              <span>{isBangla ? 'উচ্চ লবণ নমুনা (সাতক্ষীরা)' : 'High Saline Sample'}</span>
+              <span>{t('soilOCR.loadVideoDemo')}</span>
             </button>
           </div>
         }
         helpText={isBangla
-          ? 'মৃত্তিকা সম্পদ উন্নয়ন ইনস্টিটিউট (এসআরডিআই)-এর মাটি পরীক্ষার কার্ড আপলোড করে মাটির লবণাক্ততা (ইসি), পিএইচ ও পুষ্টি উপাদানের মান ডিজিটাইজ করুন।'
-          : 'Digitize official paper soil test cards issued by SRDI or regional soil testing laboratories. The extracted parameters immediately calibrate crop suitability thresholds.'}
+          ? 'রিপোর্টের ছবি থেকে ব্রাউজারেই OCR চালান অথবা ল্যাবের মান হাতে লিখুন। OCR-এর মান যাচাই করে তারপর সংরক্ষণ করুন।'
+          : 'Read a report image with browser-based OCR or enter lab values manually. Review every value before saving it to your farm profile.'}
       />
 
-      {/* Mock OCR callout notice */}
       <div className="callout callout-demo">
         <Info size={18} />
-        <span>{t('soilOCR.mockNotice')}</span>
+        <span>{t('soilOCR.browserOcrNotice')}</span>
       </div>
 
       {savedSuccess && (
         <div className="callout callout-info animate-fade-in">
           <CheckCircle2 size={18} color="var(--color-primary-600)" />
-          <span>{t('soilOCR.validationSuccess')}</span>
+          <span>
+            {t('soilOCR.validationSuccess')}{' '}
+            <Link to="/crop-suitability">{t('soilOCR.viewUpdatedSuitability')}</Link>
+          </span>
         </div>
       )}
 
       {fileError && (
         <div className="callout" style={{ backgroundColor: 'var(--color-risky-bg)', borderColor: 'var(--color-risky-border)', color: 'var(--color-risky-text)' }}>
           <AlertTriangle size={18} />
-          <span>{fileError}</span>
+          <span>
+            {fileError}
+            {ocrFailureDetail && (
+              <details style={{ marginTop: '0.5rem' }}>
+                <summary>{t('soilOCR.errorDetails')}</summary>
+                <code>{ocrFailureDetail}</code>
+              </details>
+            )}
+          </span>
         </div>
       )}
 
@@ -206,6 +252,7 @@ export const SoilReportPage = () => {
               type="file"
               accept=".jpg,.jpeg,.png,.pdf,.webp"
               onChange={handleFileDrop}
+              onClick={e => e.stopPropagation()}
               style={{ display: 'none' }}
             />
 
@@ -228,6 +275,9 @@ export const SoilReportPage = () => {
             </h3>
             <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', maxWidth: '380px', margin: '0 auto' }}>
               {t('soilOCR.dropzoneSubtitle')}
+            </p>
+            <p style={{ fontSize: '11px', color: 'var(--color-text-muted)', margin: '0.75rem auto 0', maxWidth: '380px' }}>
+              {t('soilOCR.manualEntryHint')}
             </p>
           </div>
 
@@ -262,7 +312,9 @@ export const SoilReportPage = () => {
                   </span>
                 </div>
                 <span className="badge badge-suitable" style={{ fontSize: '11px' }}>
-                  {isBangla ? 'ওসিআর স্ক্যান সম্পন্ন' : 'OCR Scanned'}
+                  {extractionResult
+                    ? extractionResult.isMock ? t('soilOCR.sampleLoaded') : t('soilOCR.ocrScanned')
+                    : t('soilOCR.fileSelected')}
                 </span>
               </div>
 
@@ -278,10 +330,16 @@ export const SoilReportPage = () => {
                   fontSize: 'var(--font-size-xs)',
                   lineHeight: 1.6
                 }}>
-                  <div><strong>{isBangla ? 'নথি:' : 'Document:'}</strong> {extractionResult?.cardName || (isBangla ? 'এসআরডিআই-এর সরকারি মাটি স্বাস্থ্য কার্ড' : 'SRDI Official Soil Health Card')}</div>
-                  <div><strong>{isBangla ? 'কৃষক:' : 'Farmer:'}</strong> {extractionResult?.farmerName || (isBangla ? 'মোঃ রফিকুল ইসলাম' : 'Md. Rafiqul Islam')}</div>
-                  <div><strong>{isBangla ? 'অবস্থান:' : 'Location:'}</strong> {extractionResult?.district || (isBangla ? 'খুলনা' : 'Khulna')}, {extractionResult?.upazila || (isBangla ? 'দাকোপ' : 'Dacope')}</div>
-                  <div><strong>{isBangla ? 'মাটির গঠন:' : 'Texture:'}</strong> {extractionResult?.soilTexture || (isBangla ? 'গঙ্গা পলির দোআঁশ' : 'Clay Loam (Ganges Alluvium)')}</div>
+                  <div><strong>{isBangla ? 'নথি:' : 'Document:'}</strong> {extractionResult?.cardName || selectedFile.name}</div>
+                  {extractionResult?.farmerName && (
+                    <div><strong>{isBangla ? 'কৃষক:' : 'Farmer:'}</strong> {extractionResult.farmerName}</div>
+                  )}
+                  {extractionResult?.district && (
+                    <div><strong>{isBangla ? 'অবস্থান:' : 'Location:'}</strong> {extractionResult.district}, {extractionResult.upazila}</div>
+                  )}
+                  {extractionResult?.soilTexture && (
+                    <div><strong>{isBangla ? 'মাটির গঠন:' : 'Texture:'}</strong> {extractionResult.soilTexture}</div>
+                  )}
                 </div>
               )}
             </div>
@@ -295,22 +353,48 @@ export const SoilReportPage = () => {
               <Sparkles size={18} color="var(--color-primary-800)" />
               <span>{t('soilOCR.extractionReview')}</span>
             </h2>
-            <DemoBadge text="Editable OCR Output" />
+            <DemoBadge
+              text={isDemoValues
+                ? t('soilOCR.sampleDataBadge')
+                : t('soilOCR.editableValuesBadge')}
+            />
           </div>
 
           <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginBottom: '1.25rem' }}>
             {t('soilOCR.reviewNotice')}
           </p>
 
+          {isDemoValues && (
+            <div className="callout callout-demo" style={{ fontSize: '12px', padding: '0.65rem 0.85rem' }}>
+              <Info size={15} style={{ flexShrink: 0 }} />
+              <span>{t('soilOCR.demoValuesNotice')}</span>
+            </div>
+          )}
+
           {missingWarning && (
             <div className="callout callout-warning" style={{ fontSize: '12px', padding: '0.65rem 0.85rem' }}>
               <AlertTriangle size={15} style={{ flexShrink: 0 }} />
-              <span>{t('soilOCR.missingWarning')}</span>
+              <span>
+                {extractionResult?.missingFields.length === SOIL_PARAMETER_FIELDS.length
+                  ? t('soilOCR.ocrNoValues')
+                  : t('soilOCR.missingWarning')}
+              </span>
+            </div>
+          )}
+
+          {formError && (
+            <div
+              className="callout"
+              style={{ backgroundColor: 'var(--color-risky-bg)', borderColor: 'var(--color-risky-border)', color: 'var(--color-risky-text)', marginBottom: '1rem' }}
+              role="alert"
+            >
+              <AlertTriangle size={16} />
+              <span>{formError}</span>
             </div>
           )}
 
           <form onSubmit={handleSaveToProfile}>
-            {/* Critical Soil Parameters: pH & EC */}
+            {/* Soil card values used by the current prototype: pH, ECe, and NPK. */}
             <div className="grid grid-cols-2" style={{ gap: '1rem', marginBottom: '1rem' }}>
               <div className="form-group" style={{ marginBottom: 0 }}>
                 <label className="form-label" htmlFor="ocr-ph">
@@ -352,23 +436,11 @@ export const SoilReportPage = () => {
               </div>
             </div>
 
-            {/* Organic Matter & Nitrogen */}
-            <div className="grid grid-cols-2" style={{ gap: '1rem', marginBottom: '1rem' }}>
-              <div className="form-group" style={{ marginBottom: 0 }}>
-                <label className="form-label" htmlFor="ocr-om">
-                  {t('soilOCR.om')}
-                </label>
-                <input
-                  id="ocr-om"
-                  type="number"
-                  step="0.01"
-                  value={formFields.organicMatter}
-                  onChange={e => handleInputChange('organicMatter', e.target.value)}
-                  className="form-control"
-                  required
-                />
-              </div>
+            <p style={{ fontSize: '11px', color: 'var(--color-text-muted)', margin: '-0.4rem 0 1rem' }}>
+              {t('soilOCR.ecBasisNotice')}
+            </p>
 
+            <div className="grid grid-cols-2" style={{ gap: '1rem', marginBottom: '1rem' }}>
               <div className="form-group" style={{ marginBottom: 0 }}>
                 <label className="form-label" htmlFor="ocr-n">
                   {t('soilOCR.nitrogen')}
@@ -376,16 +448,14 @@ export const SoilReportPage = () => {
                 <input
                   id="ocr-n"
                   type="number"
-                  step="0.01"
-                  value={formFields.nitrogen}
-                  onChange={e => handleInputChange('nitrogen', e.target.value)}
+                  step="1"
+                  min="0"
+                  max="100000"
+                  value={formFields.nitrogenMgKg}
+                  onChange={e => handleInputChange('nitrogenMgKg', e.target.value)}
                   className="form-control"
                 />
               </div>
-            </div>
-
-            {/* P & K */}
-            <div className="grid grid-cols-2" style={{ gap: '1rem', marginBottom: '1rem' }}>
               <div className="form-group" style={{ marginBottom: 0 }}>
                 <label className="form-label" htmlFor="ocr-p">
                   {t('soilOCR.phosphorus')}
@@ -393,13 +463,16 @@ export const SoilReportPage = () => {
                 <input
                   id="ocr-p"
                   type="number"
-                  step="0.1"
-                  value={formFields.phosphorus}
-                  onChange={e => handleInputChange('phosphorus', e.target.value)}
+                  step="1"
+                  min="0"
+                  max="100000"
+                  value={formFields.phosphorusMgKg}
+                  onChange={e => handleInputChange('phosphorusMgKg', e.target.value)}
                   className="form-control"
                 />
               </div>
-
+            </div>
+            <div className="grid grid-cols-2" style={{ gap: '1rem', marginBottom: '1.5rem' }}>
               <div className="form-group" style={{ marginBottom: 0 }}>
                 <label className="form-label" htmlFor="ocr-k">
                   {t('soilOCR.potassium')}
@@ -407,56 +480,11 @@ export const SoilReportPage = () => {
                 <input
                   id="ocr-k"
                   type="number"
-                  step="0.01"
-                  value={formFields.potassium}
-                  onChange={e => handleInputChange('potassium', e.target.value)}
-                  className="form-control"
-                />
-              </div>
-            </div>
-
-            {/* Micronutrients: Sulfur, Zinc, Boron */}
-            <div className="grid grid-cols-3" style={{ gap: '0.75rem', marginBottom: '1.5rem' }}>
-              <div className="form-group" style={{ marginBottom: 0 }}>
-                <label className="form-label" htmlFor="ocr-s">
-                  {t('soilOCR.sulfur')}
-                </label>
-                <input
-                  id="ocr-s"
-                  type="number"
-                  step="0.1"
-                  value={formFields.sulfur}
-                  onChange={e => handleInputChange('sulfur', e.target.value)}
-                  className="form-control"
-                />
-              </div>
-
-              <div className="form-group" style={{ marginBottom: 0 }}>
-                <label className="form-label" htmlFor="ocr-zn">
-                  {t('soilOCR.zinc')}
-                </label>
-                <input
-                  id="ocr-zn"
-                  type="number"
-                  step="0.01"
-                  value={formFields.zinc}
-                  onChange={e => handleInputChange('zinc', e.target.value)}
-                  placeholder={isBangla ? 'ঐচ্ছিক' : 'Optional'}
-                  className="form-control"
-                />
-              </div>
-
-              <div className="form-group" style={{ marginBottom: 0 }}>
-                <label className="form-label" htmlFor="ocr-b">
-                  {t('soilOCR.boron')}
-                </label>
-                <input
-                  id="ocr-b"
-                  type="number"
-                  step="0.01"
-                  value={formFields.boron}
-                  onChange={e => handleInputChange('boron', e.target.value)}
-                  placeholder={isBangla ? 'ঐচ্ছিক' : 'Optional'}
+                  step="1"
+                  min="0"
+                  max="100000"
+                  value={formFields.potassiumMgKg}
+                  onChange={e => handleInputChange('potassiumMgKg', e.target.value)}
                   className="form-control"
                 />
               </div>

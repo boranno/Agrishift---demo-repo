@@ -1,6 +1,6 @@
 /**
  * Crop Reference & Suitability Service
- * Based on published BARI, BRRI, and SRDI salinity tolerance thresholds.
+ * Demo fixtures only; source alignment and local validation are still required.
  */
 
 export const CROPS_CATALOG = [

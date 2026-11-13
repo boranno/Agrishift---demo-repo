@@ -1,0 +1,36 @@
+# Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Data and ML artifacts (adjust if small, versioned fixtures are intentional)
+data/raw/
+data/processed/
+datasets/
+models/
+*.parquet
+*.pkl
+*.joblib
+
+# Frontend
+node_modules/
+dist/
+build/
+coverage/
+
+# Editors / OS
+.vscode/*.log
+.DS_Store
+Thumbs.db

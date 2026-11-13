@@ -38,6 +38,7 @@ import {
 import { useTranslation } from '../../hooks/useTranslation';
 import { useFarm } from '../../context/FarmContext';
 import { COMPARISON_PLANS } from '../../services/rotationService';
+import { getActiveSeasonNasaProfile, KHULNA_DISTRICT_PROFILES } from '../../services/nasaTelemetryService';
 import { localizeFarmValue } from '../../utils/farmDisplay';
 import PageHeader from '../../components/common/PageHeader';
 import DemoBadge from '../../components/common/DemoBadge';
@@ -46,7 +47,10 @@ import EmptyState from '../../components/common/EmptyState';
 
 export const DashboardPage = () => {
   const { t, isBangla } = useTranslation();
-  const { farm, soil, season, setSeason, resetToDemoFarm } = useFarm();
+  const { farm, soil, season, setSeason, updateFarm, resetToDemoFarm } = useFarm();
+  const [selectedMonitorDistrict, setSelectedMonitorDistrict] = useState(
+    KHULNA_DISTRICT_PROFILES[farm?.district] ? farm.district : 'Khulna'
+  );
 
   if (!farm) {
     return (
@@ -63,89 +67,42 @@ export const DashboardPage = () => {
     );
   }
 
-  const ecValue = soil?.ec || 4.8;
-  const phValue = soil?.pH || 6.8;
-  const omValue = soil?.organicMatter || 1.65;
-
   const currentCrops = farm.currentCrops || {
     kharif1: 'Fallow / Weed Growth',
     kharif2: 'T. Aman Rice (Local Swarna)',
     rabi: 'Boro Rice (High Salinity Risk)'
   };
 
-  // 5 Core NASA Environmental Indicators
-  const NASA_INDICATORS = [
-    {
-      id: 'rain',
-      nameEn: 'Precipitation & Rain Dynamics',
-      nameBn: 'বৃষ্টিপাত ও মৌসুমি বৃষ্টিপ্রবাহ',
-      satellite: 'GPM IMERG (NASA/JAXA)',
-      icon: CloudRain,
-      color: '#0284C7',
-      valueEn: '24.5 mm / 7-day total',
-      valueBn: '২৪.৫ মিমি / বিগত ৭ দিন',
-      statusEn: 'Sample Satellite Feed',
-      statusBn: 'নমুনা উপগ্রহ তথ্য',
-      meaningEn: 'Aman transplanting moisture recharge and pre-monsoon dry spell tracking.',
-      meaningBn: 'আমন চারা রোপণের জন্য বৃষ্টির সঞ্চয় এবং খরা স্থায়িত্ব পরিমাপ।'
-    },
-    {
-      id: 'heat',
-      nameEn: 'Heat Stress & Surface Temp',
-      nameBn: 'তাপমাত্রা চাপ ও পৃষ্ঠদেশের উত্তাপ',
-      satellite: 'NASA POWER (LaRC)',
-      icon: ThermometerSun,
-      color: '#EA580C',
-      valueEn: '32.4°C max / 24.1°C min',
-      valueBn: 'সর্বোচ্চ ৩২.৪°সে / ২৪.১°সে',
-      statusEn: 'Sample Satellite Feed',
-      statusBn: 'নমুনা উপগ্রহ তথ্য',
-      meaningEn: 'Monitors thermal anomalies to prevent rice spikelet sterility and evaporative salt pull.',
-      meaningBn: 'ধানের চিটা রোগ প্রতিরোধ এবং অতিরিক্ত বাষ্পীভবনে লবণ ওঠা ট্র্যাক করে।'
-    },
-    {
-      id: 'moisture',
-      nameEn: 'Root-Zone Soil Moisture',
-      nameBn: 'মাটির আর্দ্রতা ও মূল-অঞ্চলের রস',
-      satellite: 'SMAP L4 (NASA JPL)',
-      icon: Droplets,
-      color: '#0D9488',
-      valueEn: '0.28 cm³/cm³ (28% Vol)',
-      valueBn: '০.২৮ ঘনসেমি/ঘনসেমি (২৮%)',
-      statusEn: 'Sample Satellite Feed',
-      statusBn: 'নমুনা উপগ্রহ তথ্য',
-      meaningEn: 'Drying topsoil in coastal delta accelerates upward capillary salt suction.',
-      meaningBn: 'মাটির উপরিভাগ শুকাতে শুরু করলে নিচ থেকে নোনা পানি ওপরে উঠে আসার ঝুঁকি বাড়ে।'
-    },
-    {
-      id: 'ndvi',
-      nameEn: 'Canopy Health (NDVI)',
-      nameBn: 'ফসলের স্বাস্থ্য ও ক্যানোপি সূচক',
-      satellite: 'MODIS & Landsat 8/9',
-      icon: Activity,
-      color: '#16A34A',
-      valueEn: '0.68 NDVI (Vigorous)',
-      valueBn: '০.৬৮ এনডিভিআই (সতেজ)',
-      statusEn: 'Sample Satellite Feed',
-      statusBn: 'নমুনা উপগ্রহ তথ্য',
-      meaningEn: 'Detects root-zone osmotic salinity stress before visible leaf yellowing.',
-      meaningBn: 'পাতা হলুদ হওয়ার আগেই শিকড়ে লবণাক্ততার অদৃশ্য চাপ আগাম শনাক্ত করে।'
-    },
-    {
-      id: 'et',
-      nameEn: 'Evapotranspiration (ET)',
-      nameBn: 'বাষ্পীভবন ও পানির মোট ক্ষয়',
-      satellite: 'MOD16A2 (NASA EOS)',
-      icon: Wind,
-      color: '#7C3AED',
-      valueEn: '3.8 mm/day (Winter avg)',
-      valueBn: '৩.৮ মিমি / দিন (শীতকালীন)',
-      statusEn: 'Sample Satellite Feed',
-      statusBn: 'নমুনা উপগ্রহ তথ্য',
-      meaningEn: 'Calculates field moisture loss to gauge dry-season supplemental irrigation needs.',
-      meaningBn: 'মাটি ও গাছের মোট পানি ক্ষয় হিসাব করে শীতকালীন সেচের প্রয়োজনীয়তা নির্ধারণ করে।'
-    }
-  ];
+  const activeCropForSeason =
+    season === 'rabi'
+      ? currentCrops.rabi
+      : season === 'kharif1'
+        ? currentCrops.kharif1
+        : currentCrops.kharif2;
+
+  const activeDistrict = KHULNA_DISTRICT_PROFILES[selectedMonitorDistrict]
+    ? selectedMonitorDistrict
+    : (KHULNA_DISTRICT_PROFILES[farm.district] ? farm.district : 'Khulna');
+
+  const nasaProfile = getActiveSeasonNasaProfile(activeDistrict, season, activeCropForSeason);
+
+  const ecValue = soil?.ec || nasaProfile.districtProfile.baseSalinityEc || 4.8;
+  const phValue = soil?.pH || 6.8;
+  const omValue = soil?.organicMatter || 1.65;
+
+  const ICON_MAP = {
+    rain: CloudRain,
+    heat: ThermometerSun,
+    moisture: Droplets,
+    ndvi: Activity,
+    et: Wind
+  };
+
+  // 5 Core Dynamic NASA Environmental Indicators (updates live by Season & Khulna District)
+  const NASA_INDICATORS = nasaProfile.indicators.map(ind => ({
+    ...ind,
+    icon: ICON_MAP[ind.id] || Satellite
+  }));
 
   // Secondary Tools Catalog (Subordinated to primary sections)
   const SECONDARY_TOOLS = [
@@ -234,7 +191,7 @@ export const DashboardPage = () => {
       to: '/model-evaluation',
       titleEn: 'Model Evaluation',
       titleBn: 'মডেল মূল্যায়ন',
-      descEn: 'R²=0.88 accuracy & error bounds',
+      descEn: 'PR-AUC 0.354 | Recall 60% | ΔVCI MAE 24.67',
       descBn: 'বৈজ্ঞানিক মানদণ্ড ও যাচাইকরণ রিপোর্ট',
       icon: ShieldCheck,
       color: '#2563EB'
@@ -414,14 +371,70 @@ export const DashboardPage = () => {
             </p>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', backgroundColor: '#FFFFFF', padding: '0.2rem 0.55rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)' }}>
+              <MapPin size={13} color="#15803D" />
+              <span style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--color-text-secondary)' }}>
+                {isBangla ? 'খুলনা বিভাগ জেলা:' : 'Khulna District:'}
+              </span>
+              <select
+                value={activeDistrict}
+                onChange={e => setSelectedMonitorDistrict(e.target.value)}
+                style={{
+                  border: 'none',
+                  background: 'transparent',
+                  fontSize: '11px',
+                  fontWeight: 'bold',
+                  color: 'var(--color-primary-900)',
+                  cursor: 'pointer',
+                  outline: 'none'
+                }}
+              >
+                {Object.keys(KHULNA_DISTRICT_PROFILES).map(d => (
+                  <option key={d} value={d}>
+                    {localizeFarmValue(d, isBangla)}
+                  </option>
+                ))}
+              </select>
+            </div>
             <span className="badge badge-suitable" style={{ fontSize: '11px' }}>
-              {isBangla ? 'দৃষ্টান্তমূলক উপগ্রহ পর্যবেক্ষণ (AEZ 13)' : 'Demo Satellite Observation (AEZ 13)'}
+              {isBangla ? nasaProfile.districtProfile.zoneLabelBn : nasaProfile.districtProfile.zoneLabelEn}
             </span>
             <Link to="/data-sources" className="btn btn-secondary btn-sm" style={{ fontSize: '11px', padding: '0.3rem 0.65rem' }}>
               <span>{isBangla ? 'সম্পূর্ণ পাইপলাইন ক্যাটালগ ➔' : 'Full Pipeline Specs ➔'}</span>
             </Link>
           </div>
+        </div>
+
+        {/* Active Cropping Season Context Strip */}
+        <div style={{
+          backgroundColor: '#F0FDF4',
+          border: '1px solid #BBF7D0',
+          borderRadius: 'var(--radius-lg)',
+          padding: '0.75rem 1rem',
+          marginBottom: '1rem',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '0.75rem',
+          fontSize: '12px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+            <span className="badge badge-suitable" style={{ fontSize: '10px', fontWeight: 'bold' }}>
+              {isBangla ? nasaProfile.season.nameBn : nasaProfile.season.nameEn}
+            </span>
+            <span style={{ color: 'var(--color-primary-900)', fontWeight: 'bold' }}>
+              {isBangla ? 'সক্রিয় ফসল:' : 'Active Crop:'} {activeCropForSeason}
+            </span>
+            <span style={{ color: 'var(--color-text-secondary)' }}>
+              • {isBangla ? 'বৃদ্ধির পর্যায়:' : 'Growth Stage:'} {isBangla ? nasaProfile.season.cropStageBn : nasaProfile.season.cropStageEn}
+            </span>
+          </div>
+          <Link to="/model-evaluation" style={{ fontSize: '11px', fontWeight: 'bold', color: '#15803D', display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none' }}>
+            <ShieldCheck size={14} />
+            <span>{isBangla ? 'যাচাইকৃত LightGBM মডেল (PR-AUC ০.৩৫৪ | Recall ৬০%)' : 'Verified LightGBM Model (PR-AUC 0.354 | Recall 60%)'}</span>
+          </Link>
         </div>
 
         {/* 5 Core NASA Indicator Cards Grid */}
@@ -460,7 +473,7 @@ export const DashboardPage = () => {
                       <IconComponent size={16} color={ind.color} />
                     </div>
                     <span style={{ fontSize: '9px', fontWeight: 'bold', color: 'var(--color-text-secondary)', textTransform: 'uppercase' }}>
-                      {ind.satellite.split(' ')[0]}
+                      {ind.satellite}
                     </span>
                   </div>
 
@@ -468,7 +481,7 @@ export const DashboardPage = () => {
                     {isBangla ? ind.nameBn : ind.nameEn}
                   </h3>
 
-                  <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: ind.color, margin: '0.35rem 0' }}>
+                  <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: ind.color, margin: '0.35rem 0' }}>
                     {isBangla ? ind.valueBn : ind.valueEn}
                   </div>
 
@@ -478,7 +491,7 @@ export const DashboardPage = () => {
                 </div>
 
                 <div style={{ marginTop: '0.75rem', paddingTop: '0.5rem', borderTop: '1px solid var(--color-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '10px' }}>
-                  <span className="badge badge-neutral" style={{ fontSize: '9px', padding: '0.15rem 0.4rem' }}>
+                  <span className={`badge ${ind.badgeClass || 'badge-neutral'}`} style={{ fontSize: '9px', padding: '0.15rem 0.4rem' }}>
                     {isBangla ? ind.statusBn : ind.statusEn}
                   </span>
                   <Link to="/data-sources" style={{ color: ind.color, fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '2px' }}>
@@ -489,6 +502,104 @@ export const DashboardPage = () => {
               </div>
             );
           })}
+        </div>
+
+        {/* 1-Month Ahead Multi-Hazard Early Warning Monitor (Drought VCI, Flood/Waterlogging, Storm Surge/Salinity) */}
+        <div className="card" style={{ marginBottom: '1.25rem', borderLeft: '4px solid #0284C7', backgroundColor: '#F8FAFC' }}>
+          <div className="card-header" style={{ marginBottom: '0.85rem' }}>
+            <div>
+              <h3 className="card-title" style={{ fontSize: 'var(--font-size-base)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Cpu size={18} color="#0284C7" />
+                <span>
+                  {isBangla
+                    ? `১-মাস অগ্রিম বহুমুখী দুর্যোগ পূর্বাভাস ও ফসলের ঝুঁকি (${localizeFarmValue(activeDistrict, true)} • ${nasaProfile.season.nameBn.split('(')[0].trim()})`
+                    : `1-Month Ahead Multi-Hazard Early Warning Monitor (${activeDistrict} • ${nasaProfile.season.nameEn.split('(')[0].trim()})`}
+                </span>
+              </h3>
+              <p style={{ fontSize: '11px', color: 'var(--color-text-secondary)', margin: '0.2rem 0 0 0' }}>
+                {isBangla
+                  ? 'নাসা উপগ্রহ (MODIS, CHIRPS, ERA5-Land, Sentinel-1 SAR) ও LightGBM মডেলের সমন্বয়ে সক্রিয় ফসলের আগাম সতর্কতা'
+                  : 'Powered by NASA Earth Observations (MODIS, CHIRPS, ERA5-Land, Sentinel-1 SAR) & Calibrated LightGBM Early-Warning Pipelines'}
+              </p>
+            </div>
+            <Link to="/model-evaluation" className="btn btn-secondary btn-sm" style={{ fontSize: '11px' }}>
+              <span>{isBangla ? 'মডেল বেঞ্চমার্ক দেখুন' : 'View ML Benchmark'}</span>
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-3" style={{ gap: '1rem' }}>
+            {nasaProfile.hazards.map(haz => {
+              const barColor = haz.status === 'risky' ? '#DC2626' : haz.status === 'marginal' ? '#D97706' : '#16A34A';
+              return (
+                <div
+                  key={haz.id}
+                  style={{
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: 'var(--radius-md)',
+                    padding: '0.9rem',
+                    border: '1px solid var(--color-border)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between'
+                  }}
+                >
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.4rem', marginBottom: '0.4rem' }}>
+                      <span style={{ fontSize: '9px', fontWeight: 'bold', color: '#0284C7', textTransform: 'uppercase' }}>
+                        {isBangla ? haz.modelBadgeBn : haz.modelBadgeEn}
+                      </span>
+                      <StatusBadge
+                        status={haz.status}
+                        label={isBangla ? haz.statusLabelBn : haz.statusLabelEn}
+                      />
+                    </div>
+
+                    <h4 style={{ fontSize: 'var(--font-size-xs)', fontWeight: 'bold', color: 'var(--color-text-main)', marginBottom: '0.4rem' }}>
+                      {isBangla ? haz.titleBn : haz.titleEn}
+                    </h4>
+
+                    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: '0.3rem' }}>
+                      <div>
+                        <span style={{ fontSize: '1.5rem', fontWeight: 'bold', color: barColor }}>
+                          {haz.probability}%
+                        </span>
+                        <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', marginLeft: '4px' }}>
+                          {isBangla ? `(সতর্কতা সীমা: ${haz.thresholdPct}%)` : `(Alert Thresh: ${haz.thresholdPct}%)`}
+                        </span>
+                      </div>
+                      <span style={{ fontSize: '10px', fontWeight: '600', color: 'var(--color-primary-900)' }}>
+                        {isBangla ? haz.forecastMetricBn : haz.forecastMetricEn}
+                      </span>
+                    </div>
+
+                    <div className="meter-bar" style={{ height: '6px', marginBottom: '0.6rem' }}>
+                      <div
+                        className="meter-fill"
+                        style={{
+                          width: `${Math.min(100, haz.probability)}%`,
+                          backgroundColor: barColor
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{
+                    fontSize: '11px',
+                    color: 'var(--color-text-secondary)',
+                    backgroundColor: 'var(--color-bg-cream)',
+                    padding: '0.5rem 0.65rem',
+                    borderRadius: 'var(--radius-sm)',
+                    lineHeight: 1.45
+                  }}>
+                    <strong style={{ color: 'var(--color-primary-900)' }}>
+                      {isBangla ? 'কৃষক পরামর্শ: ' : 'Advisory: '}
+                    </strong>
+                    {isBangla ? haz.advisoryBn : haz.advisoryEn}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
 
         {/* Supporting Metric Gauges & Trend Chart Row */}
