@@ -1,27 +1,39 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Sprout, Globe, Menu, X, MapPin, AlertTriangle, Layers } from 'lucide-react';
+import { Sprout, Globe, Menu, X, MapPin, ChevronDown } from 'lucide-react';
 import { useTranslation } from '../../hooks/useTranslation';
 import { useFarm } from '../../context/FarmContext';
 import { localizeFarmValue } from '../../utils/farmDisplay';
+import { HOME_TOOL_GROUPS } from '../../pages/Home/homeToolRoutes';
 
 export const Navbar = () => {
   const { t, language, setLanguage, isBangla } = useTranslation();
   const { farm } = useFarm();
   const location = useLocation();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [allPagesOpen, setAllPagesOpen] = useState(false);
+  const headerRef = useRef(null);
+  const allPagesToggleRef = useRef(null);
 
-  const navLinks = [
-    { to: '/', label: t('nav.home') },
-    { to: '/dashboard', label: t('nav.dashboard') },
-    { to: '/farm-map', label: t('nav.farmMap') },
-    { to: '/crop-suitability', label: t('nav.cropSuitability') },
-    { to: '/rotation-planner', label: t('nav.rotationPlanner') },
-    { to: '/scenario-comparison', label: t('nav.scenarioComparison') },
-    { to: '/data-sources', label: t('nav.dataSources') },
-    { to: '/soil-report', label: t('nav.soilReport') },
-    { to: '/alerts', label: t('nav.alerts') }
-  ];
+  useEffect(() => {
+    if (!allPagesOpen) return undefined;
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setAllPagesOpen(false);
+        allPagesToggleRef.current?.focus();
+      }
+    };
+    const handlePointerDown = (event) => {
+      if (!headerRef.current?.contains(event.target)) setAllPagesOpen(false);
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('pointerdown', handlePointerDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('pointerdown', handlePointerDown);
+    };
+  }, [allPagesOpen]);
 
   const isCurrent = (path) => {
     if (path === '/' && location.pathname === '/') return true;
@@ -30,7 +42,7 @@ export const Navbar = () => {
   };
 
   return (
-    <header className="glass-header" style={{
+    <header ref={headerRef} className="glass-header" style={{
       borderBottom: '1px solid var(--color-border)',
       position: 'relative'
     }}>
@@ -118,6 +130,7 @@ export const Navbar = () => {
           >
             <Globe size={15} className="language-switch-icon" aria-hidden="true" />
             <button
+              ref={allPagesToggleRef}
               type="button"
               onClick={() => setLanguage('en')}
               className={`language-switch-option${language === 'en' ? ' is-active' : ''}`}
@@ -135,41 +148,26 @@ export const Navbar = () => {
             </button>
           </div>
 
-          {/* Mobile Menu Toggle Button */}
+          {/* All pages remain one click away from the sticky top bar. */}
           <button
             type="button"
-            onClick={() => setMobileMenuOpen(prev => !prev)}
-            className="btn btn-secondary btn-sm mobile-menu-btn"
-            aria-label={mobileMenuOpen ? t('nav.close') : t('nav.menu')}
+            onClick={() => setAllPagesOpen(prev => !prev)}
+            className="btn btn-secondary btn-sm all-pages-toggle"
+            aria-expanded={allPagesOpen}
+            aria-controls="all-pages-panel"
+            aria-label={allPagesOpen ? t('nav.close') : t('nav.allPages')}
           >
-            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            {allPagesOpen ? <X size={18} aria-hidden="true" /> : <Menu size={18} aria-hidden="true" />}
+            <span>{allPagesOpen ? t('nav.close') : t('nav.allPages')}</span>
+            {!allPagesOpen && <ChevronDown className="all-pages-toggle-caret" size={15} aria-hidden="true" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Drawer Navigation */}
-      {mobileMenuOpen && (
-        <div style={{
-          backgroundColor: 'var(--color-bg-surface)',
-          borderTop: '1px solid var(--color-border)',
-          padding: '1rem',
-          boxShadow: 'var(--shadow-md)',
-          animation: 'fadeIn var(--transition-fast) ease-out',
-          maxHeight: 'calc(100vh - var(--header-total-height, 93px))',
-          overflowY: 'auto',
-          overscrollBehavior: 'contain'
-        }}>
+      {allPagesOpen && (
+        <div className="all-pages-panel" id="all-pages-panel">
           {farm && (
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              padding: '0.5rem 0.75rem',
-              backgroundColor: 'var(--color-bg-cream)',
-              borderRadius: 'var(--radius-md)',
-              marginBottom: '0.75rem',
-              fontSize: 'var(--font-size-sm)'
-            }}>
+            <div className="all-pages-farm">
               <MapPin size={15} color="var(--color-primary-800)" />
               <span>
                 <strong>{isBangla ? 'সক্রিয় খামার: ' : 'Active Farm: '}</strong>
@@ -178,55 +176,26 @@ export const Navbar = () => {
             </div>
           )}
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.5rem' }}>
-            {navLinks.map(link => (
-              <Link
-                key={link.to}
-                to={link.to}
-                onClick={() => setMobileMenuOpen(false)}
-                style={{
-                  padding: '0.65rem 0.75rem',
-                  borderRadius: 'var(--radius-md)',
-                  fontSize: 'var(--font-size-sm)',
-                  fontWeight: isCurrent(link.to) ? 'var(--font-weight-bold)' : 'var(--font-weight-medium)',
-                  color: isCurrent(link.to) ? 'var(--color-primary-800)' : 'var(--color-text-main)',
-                  backgroundColor: isCurrent(link.to) ? 'var(--color-primary-50)' : 'var(--color-bg-main)',
-                  border: isCurrent(link.to) ? '1px solid var(--color-primary-200)' : '1px solid transparent'
-                }}
-              >
-                {link.label}
-              </Link>
+          <nav className="all-pages-groups" aria-label={t('nav.allPages')}>
+            {HOME_TOOL_GROUPS.map(group => (
+              <section className="all-pages-group" key={group.titleKey} aria-labelledby={`nav-${group.titleKey}`}>
+                <h2 id={`nav-${group.titleKey}`}>{t(group.titleKey)}</h2>
+                <div className="all-pages-links">
+                  {group.items.map(item => (
+                    <Link
+                      key={item.to}
+                      to={item.to}
+                      onClick={() => setAllPagesOpen(false)}
+                      className={`all-pages-link${isCurrent(item.to) ? ' is-active' : ''}`}
+                      aria-current={location.pathname === item.to ? 'page' : undefined}
+                    >
+                      {t(item.labelKey)}
+                    </Link>
+                  ))}
+                </div>
+              </section>
             ))}
-          </div>
-
-          <div style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid var(--color-border)' }}>
-            <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)', marginBottom: '0.5rem' }}>
-              {isBangla ? 'উন্নত স্যাটেলাইট ও এআই মডেল' : 'Advanced Satellite & AI Features'}
-            </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
-              <Link to="/what-if-simulator" onClick={() => setMobileMenuOpen(false)} className="btn btn-secondary btn-sm">
-                {t('nav.whatIfSimulator')}
-              </Link>
-              <Link to="/scenario-comparison" onClick={() => setMobileMenuOpen(false)} className="btn btn-secondary btn-sm">
-                {t('nav.scenarioComparison')}
-              </Link>
-              <Link to="/data-sources" onClick={() => setMobileMenuOpen(false)} className="btn btn-secondary btn-sm">
-                {t('nav.dataSources')}
-              </Link>
-              <Link to="/salinity-prediction" onClick={() => setMobileMenuOpen(false)} className="btn btn-secondary btn-sm">
-                {t('nav.salinityPrediction')}
-              </Link>
-              <Link to="/ml-suitability" onClick={() => setMobileMenuOpen(false)} className="btn btn-secondary btn-sm">
-                {t('nav.mlSuitability')}
-              </Link>
-              <Link to="/intelligent-rotation" onClick={() => setMobileMenuOpen(false)} className="btn btn-secondary btn-sm">
-                {t('nav.intelligentRotation')}
-              </Link>
-              <Link to="/model-evaluation" onClick={() => setMobileMenuOpen(false)} className="btn btn-secondary btn-sm">
-                {t('nav.modelEvaluation')}
-              </Link>
-            </div>
-          </div>
+          </nav>
         </div>
       )}
     </header>

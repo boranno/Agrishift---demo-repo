@@ -10,7 +10,6 @@ import {
   Bell,
   CheckCircle2,
   AlertTriangle,
-  ArrowDown,
   ArrowRight,
   ShieldCheck,
   TrendingDown,
@@ -29,7 +28,6 @@ import {
 import { useTranslation } from '../../hooks/useTranslation';
 import DemoBadge from '../../components/common/DemoBadge';
 import HeroNasaGlobe from '../../components/home/HeroNasaGlobe';
-import HomeToolDirectory from '../../components/home/HomeToolDirectory';
 
 export const HomePage = () => {
   const { t, isBangla } = useTranslation();
@@ -151,10 +149,6 @@ export const HomePage = () => {
                   <Sprout size={18} color="#FFFFFF" />
                   <span>{isBangla ? 'ফসল পর্যায়ক্রম কৌশল দেখুন' : 'Explore Rotation Strategies'}</span>
                 </Link>
-                <a className="btn btn-lg home-directory-jump" href="#home-tool-directory">
-                  <span>{t('home.directoryJump')}</span>
-                  <ArrowDown size={17} aria-hidden="true" />
-                </a>
               </div>
 
               {/* Quick Metrics Ribbon (Frosted glass pills) */}
@@ -239,8 +233,6 @@ export const HomePage = () => {
           </div>
         </div>
       </section>
-
-      <HomeToolDirectory />
 
       {/* =========================================================
           SECTION 2: PROBLEM VS. SPACE PRECISION (COORDINATED GREEN)

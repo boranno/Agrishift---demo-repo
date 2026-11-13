@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { parseSoilReportText } from '../src/services/soilService.js';
+import { getSoilEcBasis, parseSoilReportText } from '../src/services/soilService.js';
 import { HOME_TOOL_GROUPS } from '../src/pages/Home/homeToolRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -101,9 +101,9 @@ const appRoutePaths = [...appSource.matchAll(/<Route\s+path="([^"]+)"/g)]
   .sort();
 const homeToolPaths = HOME_TOOL_GROUPS.flatMap(group => group.items.map(item => item.to)).sort();
 
-assert.equal(new Set(homeToolPaths).size, homeToolPaths.length, 'Home tool directory must not contain duplicate routes.');
-assert.deepEqual(homeToolPaths, appRoutePaths, 'Home tool directory must link to every app page route exactly once.');
-console.log(`✓ Home directory links to all ${homeToolPaths.length} feature routes.`);
+assert.equal(new Set(homeToolPaths).size, homeToolPaths.length, 'All-pages navigation must not contain duplicate routes.');
+assert.deepEqual(homeToolPaths, appRoutePaths, 'All-pages navigation must link to every app page route exactly once.');
+console.log(`✓ All-pages navigation links to all ${homeToolPaths.length} feature routes.`);
 
 const parsedSoilReport = parseSoilReportText([
   'pH (1:2.5): 7.2',
@@ -138,5 +138,26 @@ assert.deepEqual(parseSoilReportText([
   phosphorusMgKg: 18,
   potassiumMgKg: 150
 });
-console.log('✓ Soil report parsing extracts only pH, saturated-paste ECe, and unit-labeled NPK.');
+const providedCardText = [
+  'Parameter (Unit) Value Critical Limit / Range Interpretation / Status',
+  'Soil EC (dS/m) 3.8 < 4.0 Optimal / Low Salinity',
+  'Soil pH 6.8 6.5 - 7.5 Optimal Neutral',
+  'Nitrogen (N) (mg/kg) 145 150 - 250 Low',
+  'Phosphorus (P)',
+  '(mg/kg)',
+  '24 20 - 30 Optimum',
+  'Potassium (K) (mg/kg) 195 180 - 250 Optimum'
+].join('\n');
+
+assert.deepEqual(parseSoilReportText(providedCardText), {
+  pH: 6.8,
+  ec: 3.8,
+  nitrogenMgKg: 145,
+  phosphorusMgKg: 24,
+  potassiumMgKg: 195
+});
+assert.equal(getSoilEcBasis(providedCardText), 'unspecified');
+assert.equal(getSoilEcBasis('Soil ECe (dS/m): 4.5'), 'saturated-paste');
+assert.deepEqual(parseSoilReportText('EC (dS/m): 4.5\nEC1:5: 1.2 dS/m'), {});
+console.log('✓ Soil OCR parser reads the provided table layout and preserves an unspecified EC method.');
 

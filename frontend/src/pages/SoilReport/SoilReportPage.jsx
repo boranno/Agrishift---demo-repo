@@ -49,6 +49,7 @@ export const SoilReportPage = () => {
   const [ocrProgress, setOcrProgress] = useState({ progress: 0, stageEn: '', stageBn: '' });
   const [extractionResult, setExtractionResult] = useState(null);
   const [isDemoValues, setIsDemoValues] = useState(soil?.isDemo === true);
+  const [ecBasisConfirmed, setEcBasisConfirmed] = useState(true);
 
   const [formFields, setFormFields] = useState(() => toFormValues(soil));
 
@@ -76,6 +77,7 @@ export const SoilReportPage = () => {
     setOcrFailureDetail('');
     setSelectedFile(file);
     setIsDemoValues(false);
+    setEcBasisConfirmed(false);
     setFormFields(toFormValues());
     setMissingWarning(false);
     if (file.type.startsWith('image/')) {
@@ -102,6 +104,7 @@ export const SoilReportPage = () => {
       const result = await extractSoilReport(fileOrId, setOcrProgress);
       setExtractionResult(result);
       setIsDemoValues(result.isMock === true);
+      setEcBasisConfirmed(result.ecBasis !== 'unspecified');
       setFormFields(toFormValues(result.extractedValues));
       setMissingWarning(result.missingFields.length > 0);
     } catch (err) {
@@ -121,6 +124,7 @@ export const SoilReportPage = () => {
     setFilePreview(null);
     setExtractionResult(sample);
     setIsDemoValues(true);
+    setEcBasisConfirmed(sample.ecBasis !== 'unspecified');
     setFormFields(toFormValues(sample.extractedValues));
     setMissingWarning(sample.missingFields.length > 0);
     setSavedSuccess(false);
@@ -137,6 +141,11 @@ export const SoilReportPage = () => {
 
   const handleSaveToProfile = (e) => {
     e.preventDefault();
+    if (extractionResult?.ecBasis === 'unspecified' && !ecBasisConfirmed) {
+      setFormError(t('soilOCR.confirmEcBasisError'));
+      return;
+    }
+
     const pH = Number(formFields.pH);
     const ec = Number(formFields.ec);
     const optionalNutrients = SOIL_PARAMETER_FIELDS
@@ -439,6 +448,29 @@ export const SoilReportPage = () => {
             <p style={{ fontSize: '11px', color: 'var(--color-text-muted)', margin: '-0.4rem 0 1rem' }}>
               {t('soilOCR.ecBasisNotice')}
             </p>
+
+            {extractionResult?.ecBasis === 'unspecified' && (
+              <div className="callout callout-warning" style={{ marginBottom: '1rem' }}>
+                <Info size={16} />
+                <div>
+                  <p style={{ fontSize: 'var(--font-size-xs)', marginBottom: '0.5rem' }}>
+                    {t('soilOCR.ecMethodUnknown')}
+                  </p>
+                  <label style={{ display: 'flex', alignItems: 'flex-start', gap: '0.55rem', fontSize: 'var(--font-size-xs)', color: 'var(--color-text-main)' }}>
+                    <input
+                      type="checkbox"
+                      checked={ecBasisConfirmed}
+                      onChange={event => {
+                        setEcBasisConfirmed(event.target.checked);
+                        setFormError('');
+                      }}
+                      style={{ marginTop: '0.2rem' }}
+                    />
+                    <span>{t('soilOCR.confirmEcMethod')}</span>
+                  </label>
+                </div>
+              </div>
+            )}
 
             <div className="grid grid-cols-2" style={{ gap: '1rem', marginBottom: '1rem' }}>
               <div className="form-group" style={{ marginBottom: 0 }}>

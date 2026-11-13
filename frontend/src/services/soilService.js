@@ -5,14 +5,15 @@
 export const SAMPLE_SOIL_CARD = {
   id: 'video-demo-soil-card',
   isMock: true,
-  cardName: 'Video demo values (illustrative)',
+  cardName: 'Provided soil card example',
   extractedValues: {
-    pH: 7.2,
-    ec: 4.5,
-    nitrogenMgKg: 120,
-    phosphorusMgKg: 18,
-    potassiumMgKg: 150
+    pH: 6.8,
+    ec: 3.8,
+    nitrogenMgKg: 145,
+    phosphorusMgKg: 24,
+    potassiumMgKg: 195
   },
+  ecBasis: 'unspecified',
   missingFields: []
 };
 
@@ -34,7 +35,7 @@ export const validateSoilCardFile = (file) => {
 
 const SOIL_FIELDS = [
   { key: 'pH', pattern: '(?:soil\\s*)?p\\s*h\\b|পিএইচ|পি\\s*এইচ', min: 3, max: 10 },
-  { key: 'ec', pattern: '\\bECe\\b|saturated\\s+paste(?:\\s+extract)?|স্যাচুরেটেড\\s*পেস্ট', unit: 'dS\\s*\\/\\s*m|mS\\s*\\/\\s*cm', min: 0, max: 30 },
+  { key: 'ec', pattern: '\\bECe\\b|saturated\\s+paste(?:\\s+extract)?|স্যাচুরেটেড\\s*পেস্ট|\\bsoil\\s+EC\\b', unit: 'dS\\s*\\/\\s*m|mS\\s*\\/\\s*cm', min: 0, max: 30 },
   { key: 'nitrogenMgKg', pattern: '\\btotal\\s+nitrogen\\b|\\bnitrogen\\b|\\bN\\b|নাইট্রোজেন|এন', unit: 'ppm|mg\\s*\\/\\s*kg', min: 0, max: 100000 },
   { key: 'phosphorusMgKg', pattern: '\\bavailable\\s+phosphorus\\b|\\bphosphorus\\b|\\bP\\b(?!\\s*H)|ফসফরাস|পি(?!\\s*এইচ)', unit: 'ppm|mg\\s*\\/\\s*kg', min: 0, max: 100000 },
   { key: 'potassiumMgKg', pattern: '\\bexchangeable\\s+potassium\\b|\\bpotassium\\b|\\bK\\b|পটাশিয়াম|পটাসিয়াম|কে', unit: 'ppm|mg\\s*\\/\\s*kg', min: 0, max: 100000 }
@@ -43,22 +44,41 @@ const SOIL_FIELDS = [
 const normalizeOcrText = (text) => String(text)
   .replace(/[০-৯]/g, digit => String('০১২৩৪৫৬৭৮৯'.indexOf(digit)))
   .replace(/(\d),(\d{1,2})(?!\d)/g, '$1.$2')
-  .replace(/\(?\s*\d+\s*:\s*\d+(?:\.\d+)?\s*\)?/g, ' ');
+  .replace(/\(?\s*\d+\s*:\s*\d+(?:\.\d+)?\s*\)?/g, ' ')
+  .replace(/[ \t]+/g, ' ');
+
+const getFieldRegions = (text) => {
+  const normalizedText = normalizeOcrText(text);
+  const fieldMatches = SOIL_FIELDS.flatMap(field => {
+    const matcher = new RegExp(field.pattern, 'gi');
+    return [...normalizedText.matchAll(matcher)].map(match => ({
+      field,
+      index: match.index,
+      end: match.index + match[0].length,
+      label: match[0]
+    }));
+  }).sort((left, right) => left.index - right.index || right.end - left.end);
+
+  return fieldMatches.map((match, index) => {
+    const nextField = fieldMatches.slice(index + 1).find(candidate => (
+      candidate.field.key !== match.field.key
+    ));
+    return {
+      ...match,
+      text: normalizedText.slice(match.end, nextField ? nextField.index : match.end + 180)
+    };
+  });
+};
 
 export const parseSoilReportText = (text) => {
-  const lines = normalizeOcrText(text).split(/\r?\n/);
   const values = {};
   const numberPattern = '(\\d+(?:\\.\\d+)?|\\.\\d+)';
 
   SOIL_FIELDS.forEach(({ key, pattern, unit, min, max }) => {
-    for (const line of lines) {
-      const label = new RegExp(pattern, 'i').exec(line);
-      if (!label || (unit && !new RegExp(unit, 'i').test(line))) continue;
+    for (const region of getFieldRegions(text)) {
+      if (region.field.key !== key || (unit && !new RegExp(unit, 'i').test(region.text))) continue;
 
-      let valueText = line.slice(label.index + label[0].length)
-        .replace(/\(?\s*\d+\s*:\s*\d+(?:\.\d+)?\s*\)?/g, ' ');
-      if (unit) valueText = valueText.replace(new RegExp(unit, 'i'), ' ');
-
+      const valueText = region.text.replace(/\b\d+\s*-\s*\d+\b/g, ' ');
       const match = valueText.match(new RegExp(numberPattern));
       if (!match) continue;
 
@@ -71,6 +91,14 @@ export const parseSoilReportText = (text) => {
   });
 
   return values;
+};
+
+export const getSoilEcBasis = (text) => {
+  const ecRegion = getFieldRegions(text).find(region => region.field.key === 'ec');
+  if (!ecRegion) return null;
+  return /\bECe\b|saturated\s+paste|স্যাচুরেটেড\s*পেস্ট/i.test(ecRegion.label)
+    ? 'saturated-paste'
+    : 'unspecified';
 };
 
 const loadExternalScript = (url, globalName) => {
@@ -92,6 +120,8 @@ const loadExternalScript = (url, globalName) => {
   });
 };
 
+const MAX_PDF_PAGES = 10;
+
 const extractPdfText = async (file) => {
   const pdfjsLib = await loadExternalScript(
     'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js',
@@ -101,7 +131,7 @@ const extractPdfText = async (file) => {
   const pdf = await pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise;
   const textPages = [];
 
-  for (let pageNumber = 1; pageNumber <= Math.min(pdf.numPages, 3); pageNumber += 1) {
+  for (let pageNumber = 1; pageNumber <= Math.min(pdf.numPages, MAX_PDF_PAGES); pageNumber += 1) {
     const page = await pdf.getPage(pageNumber);
     const content = await page.getTextContent();
     const items = content.items
@@ -125,10 +155,10 @@ const extractPdfText = async (file) => {
   return { pdf, pdfjsLib, text: textPages.join('\n') };
 };
 
-const renderFirstPdfPage = async (pdf) => {
-  const page = await pdf.getPage(1);
+const renderPdfPage = async (pdf, pageNumber) => {
+  const page = await pdf.getPage(pageNumber);
   const baseViewport = page.getViewport({ scale: 1 });
-  const scale = Math.min(2500 / Math.max(baseViewport.width, baseViewport.height), 1.5);
+  const scale = Math.min(3000 / Math.max(baseViewport.width, baseViewport.height), 2.5);
   const viewport = page.getViewport({ scale });
   const canvas = document.createElement('canvas');
   canvas.width = Math.round(viewport.width);
@@ -173,13 +203,17 @@ const recognizeImage = async (image, onProgress) => {
     let bestText = '';
     let bestValues = {};
 
-    for (const pageSegmentationMode of ['6', '4']) {
-      await worker.setParameters({ tessedit_pageseg_mode: pageSegmentationMode });
-      const { data } = await worker.recognize(image);
-      const values = parseSoilReportText(data.text);
-      if (Object.keys(values).length > Object.keys(bestValues).length) {
-        bestText = data.text;
-        bestValues = values;
+    const enhancedImage = await createEnhancedOcrImage(image);
+    for (const candidateImage of [image, enhancedImage]) {
+      for (const pageSegmentationMode of ['6', '4', '11']) {
+        await worker.setParameters({ tessedit_pageseg_mode: pageSegmentationMode });
+        const { data } = await worker.recognize(candidateImage);
+        const values = parseSoilReportText(data.text);
+        if (Object.keys(values).length > Object.keys(bestValues).length) {
+          bestText = data.text;
+          bestValues = values;
+        }
+        if (Object.keys(bestValues).length === SOIL_FIELDS.length) break;
       }
       if (Object.keys(bestValues).length === SOIL_FIELDS.length) break;
     }
@@ -190,32 +224,58 @@ const recognizeImage = async (image, onProgress) => {
   }
 };
 
+const createEnhancedOcrImage = async (image) => {
+  const bitmap = await createImageBitmap(image);
+  const scale = Math.min(3000 / Math.max(bitmap.width, bitmap.height), 2.5);
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+  canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+  const context = canvas.getContext('2d', { willReadFrequently: true });
+
+  if (!context) {
+    bitmap.close();
+    throw new Error('Unable to prepare image enhancement for OCR');
+  }
+
+  context.filter = 'grayscale(1) contrast(1.45)';
+  context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  context.filter = 'none';
+  bitmap.close();
+  return canvas;
+};
+
 export const extractSoilReport = async (file, onProgress) => {
   const progress = (value, stageEn, stageBn) => {
     if (onProgress) onProgress({ progress: value, stageEn, stageBn });
   };
   let text = '';
   let values = {};
+  let ecBasis = null;
 
   if (file.type === 'application/pdf' || /\.pdf$/i.test(file.name)) {
     progress(10, 'Reading PDF in this browser...', 'এই ব্রাউজারেই PDF পড়া হচ্ছে...');
     const extractedPdf = await extractPdfText(file);
     text = extractedPdf.text;
     values = parseSoilReportText(text);
+    ecBasis = getSoilEcBasis(text);
     if (Object.keys(values).length < SOIL_FIELDS.length) {
-      progress(20, 'Preparing the first PDF page for OCR...', 'প্রথম PDF পৃষ্ঠা OCR-এর জন্য প্রস্তুত হচ্ছে...');
-      const image = await renderFirstPdfPage(extractedPdf.pdf);
-      progress(25, 'Starting OCR for the scanned PDF page...', 'স্ক্যান করা PDF পৃষ্ঠায় OCR শুরু হচ্ছে...');
-      const imageBlob = await new Promise((resolve, reject) => {
-        image.toBlob(blob => {
-          if (blob) resolve(blob);
-          else reject(new Error('Unable to prepare rendered PDF page for OCR'));
-        }, 'image/png');
-      });
-      const recognized = await recognizeImage(imageBlob, onProgress);
-      if (Object.keys(recognized.values).length > Object.keys(values).length) {
-        text = recognized.text;
-        values = recognized.values;
+      const pagesToScan = Math.min(extractedPdf.pdf.numPages, MAX_PDF_PAGES);
+      for (let pageNumber = 1; pageNumber <= pagesToScan; pageNumber += 1) {
+        progress(
+          20 + Math.round((pageNumber - 1) / pagesToScan * 10),
+          `Preparing PDF page ${pageNumber} for OCR...`,
+          `PDF-এর ${pageNumber} নম্বর পৃষ্ঠা OCR-এর জন্য প্রস্তুত হচ্ছে...`
+        );
+        const image = await renderPdfPage(extractedPdf.pdf, pageNumber);
+        const recognized = await recognizeImage(image, onProgress);
+        const mergedText = `${text}\n${recognized.text}`;
+        const mergedValues = { ...recognized.values, ...values };
+        if (Object.keys(mergedValues).length >= Object.keys(values).length) {
+          text = mergedText;
+          values = mergedValues;
+          ecBasis = getSoilEcBasis(text);
+        }
+        if (Object.keys(values).length === SOIL_FIELDS.length) break;
       }
     }
   } else {
@@ -223,12 +283,14 @@ export const extractSoilReport = async (file, onProgress) => {
     const recognized = await recognizeImage(file, onProgress);
     text = recognized.text;
     values = recognized.values;
+    ecBasis = getSoilEcBasis(text);
   }
 
   progress(100, 'Review extracted values before saving.', 'সংরক্ষণের আগে শনাক্ত করা মানগুলো যাচাই করুন।');
   return {
     cardName: file.name,
     extractedValues: values,
+    ecBasis,
     missingFields: SOIL_FIELDS.map(field => field.key).filter(key => values[key] === undefined),
     isMock: false
   };
